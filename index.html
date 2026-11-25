@@ -1,6 +1,203 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex"><title>Leads</title>
-<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f7f7f5;color:#1c1d1f;font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:420px;padding:24px 16px;text-align:center}h1{font-size:22px;margin:0 0 8px}p{color:#6b6f76;margin:0}
-@media (prefers-color-scheme:dark){body{background:#151617;color:#ecedee}p{color:#9aa0a6}}</style></head>
-<body><main><h1>Leads</h1><p>Sign-in is being set up. Check back soon.</p></main></body></html>
+<style>
+:root{--bg:#f7f7f5;--card:#fff;--ink:#1c1d1f;--mute:#6b6f76;--line:#e4e4e0;--hot:#b3261e;--hotbg:#fde8e6;--warm:#8a5a00;--warmbg:#fff1d6;--cold:#3b5b7a;--coldbg:#e6eef6;--link:#0b57d0;--ok:#1e6b3a;--bad:#b3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#151617;--card:#1e2022;--ink:#ecedee;--mute:#9aa0a6;--line:#303336;--hot:#ffb4ab;--hotbg:#4a1f1b;--warm:#ffd27a;--warmbg:#40300d;--cold:#a9c7e6;--coldbg:#1d2f40;--link:#8ab4f8;--ok:#8fd6a6;--bad:#ffb4ab}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}h1{font-size:22px;margin:0}h2{font-size:17px;margin:0 0 4px}
+#who{margin-left:auto;color:var(--mute);font-size:13px;word-break:break-all}
+p{margin:0 0 12px}.mute{color:var(--mute)}.small{font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;max-width:440px;margin:6vh auto 0}
+label{display:block;font-size:13px;color:var(--mute);margin:12px 0 4px}
+input,select,textarea{font:inherit;width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+textarea{min-height:80px;resize:vertical}
+button{font:inherit;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:disabled{opacity:.5;cursor:default}button.link{border:0;background:none;color:var(--link);padding:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row.top{margin-top:16px}.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+.bar input,.bar select{width:auto;min-width:0}.bar input[type=search]{flex:1;min-width:160px;max-width:280px}.bar input[type=number]{width:84px}
+.wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%}th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);white-space:nowrap}tr:last-child td{border-bottom:0}
+td.ph{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}td.num{font-variant-numeric:tabular-nums}td.ph a{color:var(--ink)}
+a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline}.reg{font-size:12px;color:var(--mute)}
+.tier{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}.hot{color:var(--hot);background:var(--hotbg)}.warm{color:var(--warm);background:var(--warmbg)}.cold{color:var(--cold);background:var(--coldbg)}
+#msg{margin:12px 0 0;font-size:14px;min-height:1.4em}#msg.ok{color:var(--ok)}#msg.bad{color:var(--bad)}
+.note{margin:0 0 12px;font-size:14px;min-height:1.4em}.note.ok{color:var(--ok)}.note.bad{color:var(--bad)}
+.empty{padding:28px 16px;text-align:center;color:var(--mute)}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.stat{color:var(--mute);margin-left:auto;font-size:13px}td.act{white-space:nowrap}td.act button{padding:4px 10px;font-size:13px}
+[hidden]{display:none!important}
+</style></head><body><main>
+<header><h1>Leads</h1><span id="who"></span><button id="out" hidden>Sign out</button></header>
+<div id="view"><p class="mute">Loading…</p></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
+<script src="config.js"></script>
+<script>
+const $=s=>document.querySelector(s), view=$('#view');
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const here=location.origin+location.pathname;
+let sb, user=null, recovering=false;
+
+if(!window.LEADS_CONFIG||!window.supabase){view.innerHTML='<div class="card"><h2>Sign-in is being set up</h2><p class="mute">Check back soon.</p></div>'}
+else{
+  sb=supabase.createClient(LEADS_CONFIG.url,LEADS_CONFIG.key);
+  sb.auth.onAuthStateChange((ev,session)=>{
+    if(ev==='PASSWORD_RECOVERY'){recovering=true;user=session?.user||null;setTimeout(showNewPassword,0);return}
+    const id=session?.user?.id||null; if(id===(user?.id||null)&&ev!=='INITIAL_SESSION')return;
+    user=session?.user||null; setTimeout(route,0);
+  });
+}
+$('#out').onclick=async()=>{await sb.auth.signOut()};
+
+function head(){ $('#who').textContent=user?user.email:''; $('#out').hidden=!user }
+function say(el,text,kind){el.textContent=text||'';el.className=(el.id==='msg'?'':'note ')+(kind||'')}
+function leadCells(l){
+  const tel='+1'+String(l.phone||'').replace(/\D/g,''), safe=/^https:\/\//.test(l.source_link||'');
+  const name=safe?`<a href="${esc(l.source_link)}" target="_blank" rel="noopener">${esc(l.business_name)}</a>`:esc(l.business_name);
+  return `<td class="ph"><a href="tel:${esc(tel)}">${esc(l.phone)}</a></td><td>${name}</td><td>${esc(l.city)}<div class="reg">${esc(l.region)}</div></td><td>${esc(l.category)}</td>`+
+    `<td class="num">${esc(l.google_rating||'–')}</td><td class="num">${esc(l.google_reviews??'–')}</td><td><span class="tier ${esc(l.tier)}">${esc(l.tier)}</span></td>`;
+}
+const tierRank={hot:0,warm:1,cold:2};
+const byRank=(a,b)=>(tierRank[a.tier]??3)-(tierRank[b.tier]??3)||(b.google_reviews||0)-(a.google_reviews||0)||a.id-b.id;
+
+async function route(){
+  if(recovering)return; head();
+  if(!user)return showAuth();
+  view.innerHTML='<p class="mute">Loading…</p>';
+  const {data,error}=await sb.rpc('my_state');
+  if(error){view.innerHTML=`<div class="card"><h2>Could not load</h2><p class="mute">${esc(error.message)}</p></div>`;return}
+  if(data.is_admin)return showAdmin();
+  if(!data.status)return showApply();
+  if(data.status==='pending')return showInfo('Application received','An admin will review it. Come back to this page after you have been accepted.');
+  if(data.status==='rejected')return showInfo('Application not accepted','Your application was not accepted. Contact the admin if you think this is a mistake.');
+  return showMyLeads();
+}
+function showInfo(t,b){view.innerHTML=`<div class="card"><h2>${esc(t)}</h2><p class="mute">${esc(b)}</p><button id="again">Check again</button></div>`;$('#again').onclick=route}
+
+function showAuth(mode='in'){
+  const up=mode==='up';
+  view.innerHTML=`<div class="card"><h2>${up?'Create an account':'Sign in'}</h2>
+  <p class="mute small">${up?'Use your own email. You will get a link to confirm it, then you can apply as a cold caller.':'Cold callers and admins sign in here.'}</p>
+  <form id="f"><label for="em">Email</label><input id="em" type="email" autocomplete="email" required>
+  <label for="pw">Password</label><input id="pw" type="password" autocomplete="${up?'new-password':'current-password'}" minlength="8" required>
+  <div class="row top"><button class="pri" type="submit">${up?'Create account':'Sign in'}</button>
+  <button class="link" type="button" id="swap">${up?'I already have an account':'Create an account'}</button>
+  ${up?'':'<button class="link" type="button" id="forgot">Forgot password</button>'}</div><p id="msg"></p></form></div>`;
+  const msg=$('#msg');
+  $('#swap').onclick=()=>showAuth(up?'in':'up');
+  if(!up)$('#forgot').onclick=async()=>{
+    const email=$('#em').value.trim(); if(!email)return say(msg,'Enter your email first.','bad');
+    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:here});
+    say(msg,error?error.message:'If that email has an account, a reset link is on its way.',error?'bad':'ok')};
+  $('#f').onsubmit=async e=>{
+    e.preventDefault(); const email=$('#em').value.trim(), password=$('#pw').value; say(msg,'Working…');
+    if(up){
+      const {data,error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:here}});
+      if(error)return say(msg,error.message,'bad');
+      if(!data.session)say(msg,'Check your email and open the confirmation link, then sign in here.','ok');
+    }else{
+      const {error}=await sb.auth.signInWithPassword({email,password});
+      if(error)say(msg,/not confirmed/i.test(error.message)?'Confirm your email first: open the link we sent you.':error.message,'bad');
+    }};
+}
+function showNewPassword(){
+  head();
+  view.innerHTML=`<div class="card"><h2>Set a new password</h2><form id="f"><label for="pw">New password</label>
+  <input id="pw" type="password" autocomplete="new-password" minlength="8" required><div class="row top"><button class="pri">Save password</button></div><p id="msg"></p></form></div>`;
+  $('#f').onsubmit=async e=>{e.preventDefault();const {error}=await sb.auth.updateUser({password:$('#pw').value});
+    if(error)return say($('#msg'),error.message,'bad'); recovering=false; route()};
+}
+function showApply(){
+  view.innerHTML=`<div class="card"><h2>Apply as a cold caller</h2><p class="mute small">An admin reviews every application. Once accepted, the leads assigned to you appear here.</p>
+  <form id="f"><label for="nm">Full name</label><input id="nm" autocomplete="name" required minlength="2" maxlength="120">
+  <label for="ph">Phone (optional)</label><input id="ph" type="tel" autocomplete="tel" maxlength="40">
+  <label for="nt">Anything the admin should know (optional)</label><textarea id="nt" maxlength="1000"></textarea>
+  <div class="row top"><button class="pri">Send application</button></div><p id="msg"></p></form></div>`;
+  $('#f').onsubmit=async e=>{e.preventDefault();
+    const {error}=await sb.rpc('apply_as_caller',{p_name:$('#nm').value,p_phone:$('#ph').value,p_note:$('#nt').value});
+    if(error)return say($('#msg'),error.message,'bad'); route()};
+}
+async function showMyLeads(){
+  const {data,error}=await sb.from('leads').select('*').limit(5000);
+  if(error){view.innerHTML=`<p class="note bad">${esc(error.message)}</p>`;return}
+  const rows=(data||[]).sort(byRank);
+  if(!rows.length){view.innerHTML='<div class="wrap"><div class="empty">You are accepted. No leads have been assigned to you yet.</div></div>';return}
+  view.innerHTML=`<div class="bar"><input id="q" type="search" placeholder="Search name, town, type" aria-label="Search your leads"><span class="stat" id="cnt"></span></div>
+  <div class="wrap"><table><thead><tr><th>Phone</th><th>Business</th><th>Town</th><th>Type</th><th>Rating</th><th>Reviews</th><th>Tier</th><th>Best time to call</th></tr></thead>
+  <tbody>${rows.map(l=>`<tr>${leadCells(l)}<td>${esc(l.best_time_to_call)}<div class="reg">${esc(l.local_time_zone)}</div></td></tr>`).join('')}</tbody></table></div>`;
+  const trs=[...view.querySelectorAll('tbody tr')], go=()=>{const s=$('#q').value.toLowerCase();let k=0;trs.forEach(r=>{const ok=r.textContent.toLowerCase().includes(s);r.hidden=!ok;if(ok)k++});$('#cnt').textContent=k+' of '+trs.length+' leads'};
+  $('#q').oninput=go;go();
+}
+
+/* ---------- admin ---------- */
+let A={tab:'people',callers:[],leads:[],note:['','']};
+async function showAdmin(){
+  view.innerHTML='<p class="mute">Loading…</p>';
+  const [c,l]=await Promise.all([sb.from('callers').select('*').order('applied_at',{ascending:false}),sb.from('leads').select('*').limit(10000)]);
+  if(c.error||l.error){view.innerHTML=`<p class="note bad">${esc((c.error||l.error).message)}</p>`;return}
+  A.callers=c.data; A.leads=l.data.sort(byRank); drawAdmin();
+}
+async function act(promise,okText){
+  const {data,error}=await promise;
+  A.note=error?[error.message,'bad']:[typeof okText==='function'?okText(data):okText,'ok'];
+  await showAdmin();
+}
+function drawAdmin(){
+  const held={}; A.leads.forEach(l=>{if(l.assigned_to)held[l.assigned_to]=(held[l.assigned_to]||0)+1});
+  const free=A.leads.filter(l=>!l.assigned_to).length, pending=A.callers.filter(c=>c.status==='pending'), accepted=A.callers.filter(c=>c.status==='accepted');
+  const nameOf=Object.fromEntries(A.callers.map(c=>[c.id,c.full_name]));
+  const regions=[...new Set(A.leads.map(l=>l.region).filter(Boolean))].sort();
+  const callerOpts=accepted.map(c=>`<option value="${esc(c.id)}">${esc(c.full_name)} (${held[c.id]||0})</option>`).join('');
+  let h=`<div class="tabs"><button data-tab="people" class="${A.tab==='people'?'on':''}">People${pending.length?` · ${pending.length} waiting`:''}</button>
+  <button data-tab="leads" class="${A.tab==='leads'?'on':''}">Leads</button><span class="stat">${A.leads.length} leads · ${A.leads.length-free} assigned · ${free} unassigned</span></div>
+  <p class="note ${A.note[1]}" id="note">${esc(A.note[0])}</p>`;
+  if(A.tab==='people'){
+    h+=`<h2>Applications</h2>`+(pending.length?`<div class="wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Note</th><th>Applied</th><th></th></tr></thead><tbody>${pending.map(c=>
+      `<tr><td>${esc(c.full_name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td>
+      <td class="act"><button class="pri" data-status="accepted" data-id="${esc(c.id)}">Accept</button> <button data-status="rejected" data-id="${esc(c.id)}">Reject</button></td></tr>`).join('')}</tbody></table></div>`
+      :'<p class="mute">No applications waiting.</p>');
+    h+=`<h2 style="margin-top:24px">Callers</h2>`+(accepted.length?`<p class="mute small">"Assign" gives that caller the next unassigned leads, best first. A lead only ever belongs to one caller.</p>
+      <div class="bar"><label class="small" style="margin:0">Limit to</label><select id="ft" aria-label="Tier"><option value="">Any tier</option><option>hot</option><option>warm</option><option>cold</option></select>
+      <select id="fr" aria-label="Area"><option value="">Any area</option>${regions.map(r=>`<option>${esc(r)}</option>`).join('')}</select></div>
+      <div class="wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Leads held</th><th>Assign more</th><th></th></tr></thead><tbody>${accepted.map(c=>
+      `<tr><td>${esc(c.full_name)}</td><td>${esc(c.email)}</td><td class="num">${held[c.id]||0}</td>
+      <td class="act"><div class="bar" style="margin:0"><input type="number" min="1" max="${free}" value="${Math.min(25,free)||1}" aria-label="How many leads"> <button class="pri" data-assign="${esc(c.id)}" ${free?'':'disabled'}>Assign</button></div></td>
+      <td class="act"><button data-takeback="${esc(c.id)}" ${held[c.id]?'':'disabled'}>Take back all</button> <button data-status="rejected" data-id="${esc(c.id)}">Remove</button></td></tr>`).join('')}</tbody></table></div>`
+      :'<p class="mute">No accepted callers yet.</p>');
+    const rej=A.callers.filter(c=>c.status==='rejected');
+    if(rej.length)h+=`<h2 style="margin-top:24px">Rejected or removed</h2><div class="wrap"><table><tbody>${rej.map(c=>`<tr><td>${esc(c.full_name)}</td><td>${esc(c.email)}</td><td class="act"><button data-status="accepted" data-id="${esc(c.id)}">Accept</button></td></tr>`).join('')}</tbody></table></div>`;
+  }else{
+    h+=`<div class="bar"><select id="lh" aria-label="Holder"><option value="">Everyone</option><option value="free">Unassigned</option>${accepted.map(c=>`<option value="${esc(c.id)}">${esc(c.full_name)}</option>`).join('')}</select>
+      <select id="lt" aria-label="Tier"><option value="">Any tier</option><option>hot</option><option>warm</option><option>cold</option></select>
+      <select id="lr" aria-label="Area"><option value="">Any area</option>${regions.map(r=>`<option>${esc(r)}</option>`).join('')}</select>
+      <input id="lq" type="search" placeholder="Search" aria-label="Search leads"><span class="stat" id="lcnt"></span></div>
+      <div class="bar"><button id="selall">Select shown</button><button id="selnone">Clear</button><span id="seln" class="mute small"></span>
+      <select id="to" aria-label="Assign to">${callerOpts||'<option value="">No accepted callers</option>'}</select><button class="pri" id="give">Assign selected</button><button id="take">Unassign selected</button></div>
+      <div class="wrap"><table><thead><tr><th></th><th>Phone</th><th>Business</th><th>Town</th><th>Type</th><th>Rating</th><th>Reviews</th><th>Tier</th><th>Held by</th></tr></thead><tbody>${A.leads.map(l=>
+      `<tr data-h="${esc(l.assigned_to||'free')}" data-t="${esc(l.tier)}" data-r="${esc(l.region)}"><td><input type="checkbox" value="${l.id}" aria-label="Select ${esc(l.business_name)}" style="width:auto"></td>${leadCells(l)}<td>${l.assigned_to?esc(nameOf[l.assigned_to]||'caller'):'<span class="mute">–</span>'}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  view.innerHTML=h;
+  view.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{A.tab=b.dataset.tab;A.note=['',''];drawAdmin()});
+  view.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{b.disabled=true;act(sb.rpc('admin_set_status',{p_caller:b.dataset.id,p_status:b.dataset.status}),b.dataset.status==='accepted'?'Accepted. They start with no leads.':'Done. Any leads they held are unassigned again.')});
+  view.querySelectorAll('[data-assign]').forEach(b=>b.onclick=()=>{const n=parseInt(b.previousElementSibling.value,10);if(!(n>0))return;b.disabled=true;
+    act(sb.rpc('admin_assign',{p_caller:b.dataset.assign,p_count:n,p_tier:$('#ft').value||null,p_region:$('#fr').value||null}),d=>d===n?`Assigned ${d} leads.`:`Assigned ${d} leads (only ${d} unassigned leads matched).`)});
+  view.querySelectorAll('[data-takeback]').forEach(b=>b.onclick=()=>{b.disabled=true;act(sb.rpc('admin_unassign_caller',{p_caller:b.dataset.takeback}),d=>`Took back ${d} leads.`)});
+  if(A.tab==='leads'){
+    const trs=[...view.querySelectorAll('tbody tr')], boxes=()=>trs.filter(r=>!r.hidden).map(r=>r.querySelector('input'));
+    const picked=()=>trs.map(r=>r.querySelector('input')).filter(b=>b.checked).map(b=>+b.value);
+    const count=()=>{$('#seln').textContent=picked().length+' selected'};
+    const go=()=>{const hh=$('#lh').value,t=$('#lt').value,r=$('#lr').value,s=$('#lq').value.toLowerCase();let k=0;
+      trs.forEach(x=>{const ok=(!hh||x.dataset.h===hh)&&(!t||x.dataset.t===t)&&(!r||x.dataset.r===r)&&x.textContent.toLowerCase().includes(s);x.hidden=!ok;if(!ok)x.querySelector('input').checked=false;if(ok)k++});
+      $('#lcnt').textContent=k+' shown';count()};
+    ['lh','lt','lr'].forEach(i=>$('#'+i).onchange=go);$('#lq').oninput=go;
+    $('#selall').onclick=()=>{boxes().forEach(b=>b.checked=true);count()};$('#selnone').onclick=()=>{trs.forEach(r=>r.querySelector('input').checked=false);count()};
+    view.querySelector('tbody').onchange=count;
+    $('#give').onclick=()=>{const ids=picked(),to=$('#to').value;if(!ids.length||!to){A.note=['Select some leads and a caller first.','bad'];return say($('#note'),...A.note)}
+      act(sb.rpc('admin_assign_ids',{p_caller:to,p_ids:ids}),d=>d===ids.length?`Assigned ${d} leads.`:`Assigned ${d} of ${ids.length}; the rest already belong to someone. Unassign them first to move them.`)};
+    $('#take').onclick=()=>{const ids=picked();if(!ids.length){A.note=['Select some leads first.','bad'];return say($('#note'),...A.note)}act(sb.rpc('admin_unassign_ids',{p_ids:ids}),d=>`Unassigned ${d} leads.`)};
+    go();
+  }
+}
+</script></body></html>
