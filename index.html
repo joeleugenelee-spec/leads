@@ -1,36 +1,101 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex"><title>Leads</title>
 <style>
-:root{--bg:#f7f7f5;--card:#fff;--ink:#1c1d1f;--mute:#6b6f76;--line:#e4e4e0;--hot:#b3261e;--hotbg:#fde8e6;--warm:#8a5a00;--warmbg:#fff1d6;--cold:#3b5b7a;--coldbg:#e6eef6;--link:#0b57d0;--ok:#1e6b3a;--bad:#b3261e}
-@media (prefers-color-scheme:dark){:root{--bg:#151617;--card:#1e2022;--ink:#ecedee;--mute:#9aa0a6;--line:#303336;--hot:#ffb4ab;--hotbg:#4a1f1b;--warm:#ffd27a;--warmbg:#40300d;--cold:#a9c7e6;--coldbg:#1d2f40;--link:#8ab4f8;--ok:#8fd6a6;--bad:#ffb4ab}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:1180px;margin:0 auto;padding:20px 16px 48px}
-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}h1{font-size:22px;margin:0}h2{font-size:17px;margin:0 0 4px}
-#who{margin-left:auto;color:var(--mute);font-size:13px;word-break:break-all}
+:root{color-scheme:light dark;--mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;--bg:#f6f5fa;--surface:#fff;--panel:#eeecf6;--ink:#17141f;--mute:#5e5870;--line:#dedbea;--accent:#6a3de0;--accent-ink:#fff;--ring:#6a3de0;--hl:#6a3de0;--hl-ink:#ffffff;--soft:#eeecf6;--hot:#b3261e;--hotbg:#fde9e7;--warm:#7a4f00;--warmbg:#fff0d0;--cold:#2f5578;--coldbg:#e4eef8;--link:#17141f;--ok:#0f6b3f;--okbg:#e2f4e9;--bad:#b3261e;--badbg:#fde9e7}
+@media (prefers-color-scheme:dark){:root{--bg:#0c0a12;--surface:#13111b;--panel:#1b1826;--ink:#ebe9f2;--mute:#9a93ab;--line:#292538;--accent:#a78bfa;--accent-ink:#150d2e;--ring:#a78bfa;--hl:#a78bfa;--hl-ink:#150d2e;--soft:#1b1826;--hot:#ff9d92;--hotbg:#3a1614;--warm:#ffcf70;--warmbg:#33260a;--cold:#9cc4ee;--coldbg:#14263a;--link:#ebe9f2;--ok:#7fe0a6;--okbg:#11301f;--bad:#ff9d92;--badbg:#3a1614}}
+*{box-sizing:border-box}html{scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;caret-color:var(--accent);accent-color:var(--accent);-webkit-text-size-adjust:100%}
+::selection{background:var(--accent);color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#top{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+#top .in{max-width:1180px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:8px 24px;min-height:56px;flex-wrap:wrap}
+h1{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:0}
+#nav{display:flex;gap:4px;align-self:stretch;min-width:0}
+#nav button{height:auto;min-height:56px;border:0;border-radius:0;background:none;padding:0 12px;color:var(--mute);font-weight:500;font-size:15px;box-shadow:inset 0 -2px 0 transparent;white-space:nowrap}
+#nav button:focus-visible{outline-offset:-3px}#nav button:hover{color:var(--ink);background:none}#nav button[aria-current]{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--accent)}
+.badge{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600;background:var(--panel);color:var(--mute);font-variant-numeric:tabular-nums}.badge.new{background:var(--accent);color:var(--accent-ink)}
+.acct{margin-left:auto;display:flex;align-items:center;gap:12px;min-width:0}
+#who{color:var(--mute);font-size:13px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}
+h2{font-size:18px;font-weight:650;letter-spacing:-.01em;margin:0}
 p{margin:0 0 12px}.mute{color:var(--mute)}.small{font-size:13px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;max-width:440px;margin:6vh auto 0}
-label{display:block;font-size:13px;color:var(--mute);margin:12px 0 4px}
-input,select,textarea{font:inherit;width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
-textarea{min-height:80px;resize:vertical}
-button{font:inherit;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
-button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-button:disabled{opacity:.5;cursor:default}button.link{border:0;background:none;color:var(--link);padding:0}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row.top{margin-top:16px}.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
-.bar input,.bar select{width:auto;min-width:0}.bar input[type=search]{flex:1;min-width:160px;max-width:280px}.bar input[type=number]{width:84px}
-.wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px}
-table{border-collapse:collapse;width:100%}th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);white-space:nowrap}tr:last-child td{border-bottom:0}
-td.ph{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}td.num{font-variant-numeric:tabular-nums}td.ph a{color:var(--ink)}
-a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline}.reg{font-size:12px;color:var(--mute)}
-.tier{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}.hot{color:var(--hot);background:var(--hotbg)}.warm{color:var(--warm);background:var(--warmbg)}.cold{color:var(--cold);background:var(--coldbg)}.tier.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}.tier.no{color:var(--mute);background:color-mix(in srgb,var(--mute) 14%,transparent)}
-#msg{margin:12px 0 0;font-size:14px;min-height:1.4em}#msg.ok{color:var(--ok)}#msg.bad{color:var(--bad)}
-.note{margin:0 0 12px;font-size:14px;min-height:1.4em}.note.ok{color:var(--ok)}.note.bad{color:var(--bad)}
-.empty{padding:28px 16px;text-align:center;color:var(--mute)}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.stat{color:var(--mute);margin-left:auto;font-size:13px}td.act{white-space:nowrap}td.act button{padding:4px 10px;font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;max-width:420px;margin:6vh auto 0}.card h2{margin-bottom:6px}
+label{display:block;font-size:13px;font-weight:500;color:var(--mute);margin:14px 0 4px}
+input,select,textarea{font:inherit;width:100%;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+input::placeholder,textarea::placeholder{color:var(--mute);opacity:1}
+input:hover,select:hover,textarea:hover{border-color:var(--mute)}
+textarea{height:auto;min-height:88px;padding:8px 12px;resize:vertical}input[type=checkbox]{width:16px;height:16px;padding:0;vertical-align:middle}
+button{font:inherit;font-size:14px;font-weight:500;height:36px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;white-space:nowrap;transition:background-color .15s,border-color .15s,opacity .15s}
+button:hover:not(:disabled){background:var(--panel)}button:active:not(:disabled){opacity:.8}
+button.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}button.pri:hover:not(:disabled){background:var(--accent);opacity:.9}
+button.danger{color:var(--bad)}button:disabled{opacity:.45;cursor:default}
+button.link{height:auto;border:0;background:none;color:var(--link);padding:0;font-weight:500}button.link:hover:not(:disabled){background:none;text-decoration:underline}
+.row{display:flex;gap:8px 16px;flex-wrap:wrap;align-items:center}.row.top{margin-top:20px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+.bar input,.bar select{width:auto;min-width:0}.bar input[type=search]{flex:1;min-width:160px;max-width:300px}.bar input[type=number]{width:76px}
+.bar.sel{position:sticky;top:57px;z-index:3;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px}.bar.sel .gap{margin-left:auto}
+.grp{display:flex;gap:6px;align-items:center}.grp input[type=number]{width:76px}
+.pagehead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 12px}.sec+.sec,details.sec{margin-top:32px}
+.stat{color:var(--mute);margin-left:auto;font-size:13px;font-variant-numeric:tabular-nums}
+.sum{display:grid;grid-template-columns:repeat(4,1fr);margin:0 0 24px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.sum div{padding:12px 16px;border-left:1px solid var(--line)}.sum div:first-child{border-left:0}
+.sum dt{font-size:13px;color:var(--mute)}.sum dd{margin:2px 0 0;font-size:22px;font-weight:650;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}.wrap.attn{border-color:var(--accent)}
+table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:12px;font-weight:600;color:var(--mute);white-space:nowrap;background:var(--panel)}tr:last-child td{border-bottom:0}
+tbody tr:hover{background:color-mix(in srgb,var(--panel) 45%,transparent)}
+td.ph{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}td.num,th.num{font-variant-numeric:tabular-nums;text-align:right}td.ph a{color:var(--ink)}td.held{font-weight:650;font-size:15px}
+.nm{font-weight:600}.c-time{white-space:nowrap}td.end{text-align:right}
+a{color:var(--link);text-decoration:none;text-underline-offset:3px}a:hover{text-decoration:underline}.reg{font-size:12px;color:var(--mute)}
+.tier{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}.hot{color:var(--hot);background:var(--hotbg)}.warm{color:var(--warm);background:var(--warmbg)}.cold{color:var(--cold);background:var(--coldbg)}.tier.ok{color:var(--ok);background:var(--okbg)}.tier.no{color:var(--mute);background:var(--panel)}
+#msg,.note{margin:0 0 12px;font-size:14px;padding:8px 12px;border-radius:8px}#msg:empty,.note:empty{display:none}
+#msg.ok,.note.ok{color:var(--ok);background:var(--okbg)}#msg.bad,.note.bad{color:var(--bad);background:var(--badbg)}
+.card #msg{margin:16px 0 0}
+.empty{padding:40px 16px;text-align:center;color:var(--mute)}
+td.act{white-space:nowrap}td.act button{height:32px;padding:0 12px;font-size:13px}
+details.sec summary{cursor:pointer;font-weight:600;color:var(--mute);padding:4px 0;width:fit-content}details.sec[open] summary{margin-bottom:12px}
+.skel{display:grid;gap:10px;max-width:520px}.skel i{display:block;height:14px;border-radius:6px;background:var(--panel);animation:pulse 1.2s ease-in-out infinite alternate}.skel i:nth-child(2){width:80%}.skel i:nth-child(3){width:55%}
+@keyframes pulse{to{opacity:.45}}@media (prefers-reduced-motion:reduce){.skel i{animation:none}button{transition:none}}
 [hidden]{display:none!important}
-</style></head><body><main>
-<header><h1>Leads</h1><span id="who"></span><button id="out" hidden>Sign out</button></header>
-<div id="view"><p class="mute">Loading…</p></div>
+@media (max-width:760px){
+#top .in{padding-top:8px}h1{min-height:32px;display:flex;align-items:center}#nav{order:3;flex-basis:100%;overflow-x:auto;margin:0 -16px;padding:0 4px}#nav button{min-height:44px}#who{max-width:150px}
+main{padding-top:16px}.sum{grid-template-columns:repeat(2,1fr)}.sum div:nth-child(3){border-left:0}.sum div:nth-child(n+3){border-top:1px solid var(--line)}
+.bar.sel{position:static}.bar.sel .gap{margin-left:0}
+.mine thead{display:none}.mine,.mine tbody{display:block}
+.mine tr{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:14px 16px;border-bottom:1px solid var(--line)}.mine tr:last-child{border-bottom:0}
+.mine td{display:block;padding:0;border:0;font-size:13px;color:var(--mute);text-align:left}
+.mine .c-biz{order:1;flex:1 1 60%;font-size:16px;font-weight:600;color:var(--ink)}.mine .c-tier{order:2}
+.mine .c-town{order:3}.mine .c-town .reg{display:inline;font-size:13px}.mine .c-town .reg::before{content:", "}.mine .c-type{order:4}
+.mine .c-rate{order:5}.mine .c-rate::before{content:"Rating "}.mine .c-rev{order:6}.mine .c-rev::after{content:" reviews"}
+.mine .c-time{order:7;flex-basis:100%;white-space:normal}.mine .c-time::before{content:"Best time: "}.mine .c-time .reg{display:inline;font-size:13px}.mine .c-time .reg::before{content:" · "}
+.mine .ph{order:8;flex-basis:100%;margin-top:10px}.mine .ph a{display:flex;align-items:center;justify-content:center;height:44px;border-radius:8px;background:var(--accent);color:var(--accent-ink);font-size:16px}.mine .ph a::before{content:"Call\00a0"}
+.mine .act{order:9;flex-basis:100%;display:flex;gap:8px;margin-top:6px;white-space:normal}.mine td.act button{flex:1;height:44px;font-size:14px}.mine td.act button.link{flex:0 0 auto;padding:0 8px}
+}
+/* modern pass */
+body{font-size:14.5px;letter-spacing:-.005em}:focus-visible{outline-color:var(--ring)}::selection{background:var(--hl);color:var(--hl-ink)}
+h1{display:flex;align-items:center;gap:10px;font-size:16px;letter-spacing:-.02em}h1::before{content:"";width:12px;height:12px;border-radius:3px;background:var(--hl);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 25%,transparent)}
+h2{font-size:19px;letter-spacing:-.02em}
+#nav button{font-size:14px}#nav button[aria-current]{box-shadow:inset 0 -2px 0 var(--ring)}
+.badge,.stat,.sum dd,td.ph,td.num,td.held,#who,input[type=number]{font-family:var(--mono);letter-spacing:0}
+.badge{border-radius:5px;font-size:11px;padding:2px 6px}.badge.new{background:var(--hl);color:var(--hl-ink)}
+input,select,textarea,button{border-radius:7px}.card,.wrap,.sum{border-radius:10px}.bar.sel{border-radius:9px}
+th,.sum dt{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em}
+th{background:none;border-bottom-color:var(--line)}
+.sum dd{font-size:26px;font-weight:600;letter-spacing:-.03em;margin-top:4px}.sum div{padding:14px 16px}
+td.ph{font-weight:500}.stat{font-size:12px}
+.tier{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-radius:5px;padding:2px 7px}
+.tier.ok,.tier.no{text-transform:none;letter-spacing:0;font-family:inherit;font-size:12px}
+td a,.mine .c-biz a{font-weight:500;text-decoration:underline;text-decoration-color:var(--line);text-decoration-thickness:1px}td a:hover{text-decoration-color:currentColor}td.ph a{text-decoration:none}
+.wrap.attn{border-color:var(--ring)}
+button.link{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+@media (max-width:760px){.mine .ph a{text-decoration:none;font-family:var(--mono);font-weight:600}.mine .c-biz a{text-decoration:none}.mine .c-biz{flex:1 1 calc(100% - 90px)}
+.stack thead{display:none}.stack,.stack tbody{display:block}.stack tr{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:14px;border-bottom:1px solid var(--line)}.stack tr:last-child{border-bottom:0}
+.stack td{display:block;padding:0;border:0;text-align:left}.stack td:empty{display:none}.stack td:first-child{flex:1 1 55%}.stack td.held::after{content:" held";font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:12px;font-weight:400;color:var(--mute)}
+.stack td.act{flex-basis:100%;white-space:normal}.stack td.end{display:flex;gap:8px}.stack td.act button{height:40px}.stack td.end button{flex:1}.stack .grp input{flex:1;height:40px}.stack .grp button{flex:1}
+#nav{scrollbar-width:none}#nav::-webkit-scrollbar{display:none}.bar.sel select{flex:1 1 100%}.bar.sel #give,.bar.sel #take{flex:1;height:40px}}
+</style></head><body><header id="top"><div class="in"><h1>Leads</h1><nav id="nav" aria-label="Sections"></nav><div class="acct"><span id="who"></span><button id="out" hidden>Sign out</button></div></div></header>
+<main>
+<div id="view"><div class="skel" aria-label="Loading"><i></i><i></i><i></i></div></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
 <script src="config.js"></script>
@@ -38,6 +103,7 @@ a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline}.reg{
 const $=s=>document.querySelector(s), view=$('#view');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const here=location.origin+location.pathname;
+const LOADING='<div class="skel" aria-label="Loading"><i></i><i></i><i></i></div>';
 let sb, user=null, recovering=false;
 
 if(!window.LEADS_CONFIG||!window.supabase){view.innerHTML='<div class="card"><h2>Sign-in is being set up</h2><p class="mute">Check back soon.</p></div>'}
@@ -51,21 +117,21 @@ else{
 }
 $('#out').onclick=async()=>{await sb.auth.signOut()};
 
-function head(){ $('#who').textContent=user?user.email:''; $('#out').hidden=!user }
+function head(){ $('#who').textContent=user?user.email:''; $('#who').title=user?user.email:''; $('#out').hidden=!user }
 function say(el,text,kind){el.textContent=text||'';el.className=(el.id==='msg'?'':'note ')+(kind||'')}
 function leadCells(l){
   const tel='+1'+String(l.phone||'').replace(/\D/g,''), safe=/^https:\/\//.test(l.source_link||'');
   const name=safe?`<a href="${esc(l.source_link)}" target="_blank" rel="noopener">${esc(l.business_name)}</a>`:esc(l.business_name);
-  return `<td class="ph"><a href="tel:${esc(tel)}">${esc(l.phone)}</a></td><td>${name}</td><td>${esc(l.city)}<div class="reg">${esc(l.region)}</div></td><td>${esc(l.category)}</td>`+
-    `<td class="num">${esc(l.google_rating||'–')}</td><td class="num">${esc(l.google_reviews??'–')}</td><td><span class="tier ${esc(l.tier)}">${esc(l.tier)}</span></td>`;
+  return `<td class="ph"><a href="tel:${esc(tel)}">${esc(l.phone)}</a></td><td class="c-biz">${name}</td><td class="c-town">${esc(l.city)}<div class="reg">${esc(l.region)}</div></td><td class="c-type">${esc(l.category)}</td>`+
+    `<td class="num c-rate">${esc(l.google_rating||'–')}</td><td class="num c-rev">${esc(l.google_reviews??'–')}</td><td class="c-tier"><span class="tier ${esc(l.tier)}">${esc(l.tier)}</span></td>`;
 }
 const tierRank={hot:0,warm:1,cold:2};
 const byRank=(a,b)=>(tierRank[a.tier]??3)-(tierRank[b.tier]??3)||(b.google_reviews||0)-(a.google_reviews||0)||a.id-b.id;
 
 async function route(){
-  A.live=false; if(recovering)return; head();
+  A.live=false; $('#nav').innerHTML=''; if(recovering)return; head();
   if(!user)return showAuth();
-  view.innerHTML='<p class="mute">Loading…</p>';
+  view.innerHTML=LOADING;
   const {data,error}=await sb.rpc('my_state');
   if(error){view.innerHTML=`<div class="card"><h2>Could not load</h2><p class="mute">${esc(error.message)}</p></div>`;return}
   if(data.is_admin)return showAdmin();
@@ -123,10 +189,11 @@ async function showMyLeads(){
   const {data,error}=await sb.from('leads').select('*').limit(5000);
   if(error){view.innerHTML=`<p class="note bad">${esc(error.message)}</p>`;return}
   const rows=(data||[]).sort(byRank);
-  if(!rows.length){view.innerHTML='<div class="wrap"><div class="empty">You have no leads to call right now. New ones appear here when the admin assigns them.</div></div><div class="row top"><button id="again">Check again</button></div>';$('#again').onclick=showMyLeads;return}
-  view.innerHTML=`<div class="bar"><input id="q" type="search" placeholder="Search name, town, type" aria-label="Search your leads"><span class="stat" id="cnt"></span></div>
-  <div class="wrap"><table><thead><tr><th>Phone</th><th>Business</th><th>Town</th><th>Type</th><th>Rating</th><th>Reviews</th><th>Tier</th><th>Best time to call</th><th>After the call</th></tr></thead>
-  <tbody>${rows.map(l=>`<tr data-id="${l.id}">${leadCells(l)}<td>${esc(l.best_time_to_call)}<div class="reg">${esc(l.local_time_zone)}</div></td><td class="act"><button data-done>Check off</button></td></tr>`).join('')}</tbody></table></div><p id="msg"></p>`;
+  if(!rows.length){view.innerHTML='<div class="pagehead"><h2>Your leads</h2></div><div class="wrap"><div class="empty">You have no leads to call right now. New ones appear here when the admin assigns them.</div></div><div class="row top"><button id="again">Check again</button></div>';$('#again').onclick=showMyLeads;return}
+  view.innerHTML=`<div class="pagehead"><h2>Your leads</h2><span class="stat" id="cnt"></span></div>
+  <div class="bar"><input id="q" type="search" placeholder="Search name, town, type" aria-label="Search your leads"></div><p id="msg" role="status"></p>
+  <div class="wrap"><table class="mine"><thead><tr><th>Phone</th><th>Business</th><th>Town</th><th>Type</th><th class="num">Rating</th><th class="num">Reviews</th><th>Tier</th><th>Best time to call</th><th>After the call</th></tr></thead>
+  <tbody>${rows.map(l=>`<tr data-id="${l.id}">${leadCells(l)}<td class="c-time">${esc(l.best_time_to_call)}<div class="reg">${esc(l.local_time_zone)}</div></td><td class="act"><button data-done>Check off</button></td></tr>`).join('')}</tbody></table></div>`;
   let trs=[...view.querySelectorAll('tbody tr')]; const go=()=>{const s=$('#q').value.toLowerCase();let k=0;trs.forEach(r=>{const ok=r.textContent.toLowerCase().includes(s);r.hidden=!ok;if(ok)k++});$('#cnt').textContent=k+' of '+trs.length+' leads'};
   $('#q').oninput=go;go();
   view.querySelector('tbody').onclick=async e=>{
@@ -144,9 +211,9 @@ async function showMyLeads(){
 }
 
 /* ---------- admin ---------- */
-let A={tab:'people',callers:[],leads:[],note:['',''],live:false,busy:false,dirty:false};
+let A={tab:'people',callers:[],leads:[],note:['',''],live:false,busy:false,dirty:false,rejOpen:false};
 async function showAdmin(){
-  view.innerHTML='<p class="mute">Loading…</p>';
+  view.innerHTML=LOADING;
   const [c,l]=await Promise.all([sb.from('callers').select('*').order('applied_at',{ascending:false}),sb.from('leads').select('*').limit(10000)]);
   if(c.error||l.error){view.innerHTML=`<p class="note bad">${esc((c.error||l.error).message)}</p>`;return}
   A.callers=c.data; A.leads=l.data.sort(byRank); A.live=true; A.dirty=false; drawAdmin();
@@ -195,29 +262,30 @@ function drawAdmin(){
   const nameOf=Object.fromEntries(A.callers.map(c=>[c.id,c.full_name]));
   const regions=[...new Set(A.leads.map(l=>l.region).filter(Boolean))].sort();
   const callerOpts=accepted.map(c=>`<option value="${esc(c.id)}">${esc(c.full_name)} (${held[c.id]||0})</option>`).join('');
-  let h=`<div class="tabs"><button data-tab="people" class="${A.tab==='people'?'on':''}">People${pending.length?` · ${pending.length} waiting`:''}</button>
-  <button data-tab="leads" class="${A.tab==='leads'?'on':''}">Leads</button>
-  <button data-tab="done" class="${A.tab==='done'?'on':''}">People leads completed${done.length?` · ${done.length}`:''}</button>
-  <span class="stat">${A.leads.length} leads · ${open.length-free} with callers · ${free} unassigned · ${done.length} completed</span></div>
-  <p class="note ${A.note[1]}" id="note">${esc(A.note[0])}</p>`;
+  const cur=t=>A.tab===t?' aria-current="page"':'';
+  $('#nav').innerHTML=`<button id="tab-people" data-tab="people"${cur('people')}>People${pending.length?`<span class="badge new">${pending.length} waiting</span>`:''}</button>
+  <button id="tab-leads" data-tab="leads"${cur('leads')}>Leads<span class="badge">${open.length}</span></button>
+  <button id="tab-done" data-tab="done"${cur('done')}>People leads completed<span class="badge">${done.length}</span></button>`;
+  let h=`<dl class="sum"><div><dt>Leads</dt><dd>${A.leads.length}</dd></div><div><dt>Unassigned</dt><dd>${free}</dd></div><div><dt>With callers</dt><dd>${open.length-free}</dd></div><div><dt>Completed</dt><dd>${done.length}</dd></div></dl>
+  <p class="note ${A.note[1]}" id="note" role="status">${esc(A.note[0])}</p>`;
   if(A.tab==='people'){
-    h+=`<h2>Applications</h2>`+(pending.length?`<div class="wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Note</th><th>Applied</th><th></th></tr></thead><tbody>${pending.map(c=>
-      `<tr><td>${esc(c.full_name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td>
-      <td class="act"><button class="pri" data-status="accepted" data-id="${esc(c.id)}">Accept</button> <button data-status="rejected" data-id="${esc(c.id)}">Reject</button></td></tr>`).join('')}</tbody></table></div>`
-      :'<p class="mute">No applications waiting.</p>');
-    h+=`<h2 style="margin-top:24px">Callers</h2>`+(accepted.length?`<p class="mute small">"Assign" gives that caller the next unassigned leads, best first. A lead only ever belongs to one caller.</p>
-      <div class="bar"><label class="small" style="margin:0">Limit to</label><select id="ft" aria-label="Tier"><option value="">Any tier</option><option>hot</option><option>warm</option><option>cold</option></select>
+    h+=`<section class="sec"><div class="pagehead"><h2>Applications</h2></div>`+(pending.length?`<div class="wrap attn"><table class="stack"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Note</th><th>Applied</th><th></th></tr></thead><tbody>${pending.map(c=>
+      `<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td>
+      <td class="act end"><button class="pri" data-status="accepted" data-id="${esc(c.id)}">Accept</button> <button data-status="rejected" data-id="${esc(c.id)}">Reject</button></td></tr>`).join('')}</tbody></table></div>`
+      :'<p class="mute">No applications waiting.</p>')+'</section>';
+    h+=`<section class="sec"><div class="pagehead"><h2>Callers</h2><span class="stat">${accepted.length} accepted</span></div>`+(accepted.length?`<p class="mute small">"Assign" gives that caller the next unassigned leads, best first. A lead only ever belongs to one caller.</p>
+      <div class="bar"><label class="small" style="margin:0" for="ft">Assign from</label><select id="ft" aria-label="Tier"><option value="">Any tier</option><option>hot</option><option>warm</option><option>cold</option></select>
       <select id="fr" aria-label="Area"><option value="">Any area</option>${regions.map(r=>`<option>${esc(r)}</option>`).join('')}</select></div>
-      <div class="wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Leads held</th><th>Assign more</th><th></th></tr></thead><tbody>${accepted.map(c=>
-      `<tr><td>${esc(c.full_name)}</td><td>${esc(c.email)}</td><td class="num">${held[c.id]||0}</td>
-      <td class="act"><div class="bar" style="margin:0"><input type="number" min="1" max="${free}" value="${Math.min(25,free)||1}" aria-label="How many leads"> <button class="pri" data-assign="${esc(c.id)}" ${free?'':'disabled'}>Assign</button></div></td>
-      <td class="act"><button data-takeback="${esc(c.id)}" ${held[c.id]?'':'disabled'}>Take back all</button> <button data-status="rejected" data-id="${esc(c.id)}">Remove</button></td></tr>`).join('')}</tbody></table></div>`
-      :'<p class="mute">No accepted callers yet.</p>');
+      <div class="wrap"><table class="stack"><thead><tr><th>Caller</th><th class="num">Leads held</th><th>Assign more</th><th></th></tr></thead><tbody>${accepted.map(c=>
+      `<tr><td><div class="nm">${esc(c.full_name)}</div><div class="reg">${esc(c.email)}</div></td><td class="num held">${held[c.id]||0}</td>
+      <td class="act"><div class="grp"><input type="number" min="1" max="${free}" value="${Math.min(25,free)||1}" aria-label="How many leads"> <button class="pri" data-assign="${esc(c.id)}" ${free?'':'disabled'}>Assign</button></div></td>
+      <td class="act end"><button data-takeback="${esc(c.id)}" ${held[c.id]?'':'disabled'}>Take back all</button> <button class="danger" data-status="rejected" data-id="${esc(c.id)}">Remove</button></td></tr>`).join('')}</tbody></table></div>`
+      :'<p class="mute">No accepted callers yet. Accept an application above and they appear here.</p>')+'</section>';
     const rej=A.callers.filter(c=>c.status==='rejected');
-    if(rej.length)h+=`<h2 style="margin-top:24px">Rejected or removed</h2><div class="wrap"><table><tbody>${rej.map(c=>`<tr><td>${esc(c.full_name)}</td><td>${esc(c.email)}</td><td class="act"><button data-status="accepted" data-id="${esc(c.id)}">Accept</button></td></tr>`).join('')}</tbody></table></div>`;
+    if(rej.length)h+=`<details class="sec" id="rej"${A.rejOpen?' open':''}><summary>Rejected or removed<span class="badge">${rej.length}</span></summary><div class="wrap"><table><tbody>${rej.map(c=>`<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.email)}</td><td class="act end"><button data-status="accepted" data-id="${esc(c.id)}">Accept</button></td></tr>`).join('')}</tbody></table></div></details>`;
   }else if(A.tab==='done'){
     const who=[...new Set(done.map(l=>l.completed_by_name||'Unknown'))].sort();
-    h+=`<h2>People leads completed</h2><p class="mute small">Leads a caller has checked off. ${done.length} completed: ${booked} booked a call, ${done.length-booked} did not. Completed leads are never handed out again unless you put them back.</p>`+
+    h+=`<div class="pagehead"><h2>People leads completed</h2></div><p class="mute small">Leads a caller has checked off. ${done.length} completed: ${booked} booked a call, ${done.length-booked} did not. Completed leads are never handed out again unless you put them back.</p>`+
     (done.length?`<div class="bar"><select id="dw" aria-label="Caller"><option value="">Every caller</option>${who.map(n=>`<option>${esc(n)}</option>`).join('')}</select>
       <select id="do" aria-label="Result"><option value="">Any result</option><option value="booked">Booked a call</option><option value="not_booked">No booking</option></select>
       <input id="dq" type="search" placeholder="Search" aria-label="Search completed leads"><span class="stat" id="dcnt"></span></div>
@@ -225,20 +293,21 @@ function drawAdmin(){
       `<tr data-w="${esc(l.completed_by_name||'Unknown')}" data-o="${esc(l.outcome)}"><td><span class="tier ${l.outcome==='booked'?'ok':'no'}">${l.outcome==='booked'?'Booked a call':'No booking'}</span></td><td>${esc(l.completed_by_name||'Unknown')}</td>
       <td>${/^https:\/\//.test(l.source_link||'')?`<a href="${esc(l.source_link)}" target="_blank" rel="noopener">${esc(l.business_name)}</a>`:esc(l.business_name)}</td><td class="ph">${esc(l.phone)}</td>
       <td>${esc(l.city)}<div class="reg">${esc(l.region)}</div></td><td>${esc(l.category)}</td><td>${new Date(l.completed_at).toLocaleString([], {dateStyle:'medium',timeStyle:'short'})}</td>
-      <td class="act"><button data-reopen="${l.id}">Put back</button></td></tr>`).join('')}</tbody></table></div>`
+      <td class="act end"><button data-reopen="${l.id}">Put back</button></td></tr>`).join('')}</tbody></table></div>`
       :'<div class="wrap"><div class="empty">No leads have been checked off yet.</div></div>');
   }else{
     h+=`<div class="bar"><select id="lh" aria-label="Holder"><option value="">Everyone</option><option value="free">Unassigned</option>${accepted.map(c=>`<option value="${esc(c.id)}">${esc(c.full_name)}</option>`).join('')}</select>
       <select id="lt" aria-label="Tier"><option value="">Any tier</option><option>hot</option><option>warm</option><option>cold</option></select>
       <select id="lr" aria-label="Area"><option value="">Any area</option>${regions.map(r=>`<option>${esc(r)}</option>`).join('')}</select>
       <input id="lq" type="search" placeholder="Search" aria-label="Search leads"><span class="stat" id="lcnt"></span></div>
-      <div class="bar"><button id="selall">Select shown</button><button id="selnone">Clear</button><span id="seln" class="mute small"></span>
-      <select id="to" aria-label="Assign to">${callerOpts||'<option value="">No accepted callers</option>'}</select><button class="pri" id="give">Assign selected</button><button id="take">Unassign selected</button></div>
-      <div class="wrap"><table><thead><tr><th></th><th>Phone</th><th>Business</th><th>Town</th><th>Type</th><th>Rating</th><th>Reviews</th><th>Tier</th><th>Held by</th></tr></thead><tbody>${open.map(l=>
-      `<tr data-h="${esc(l.assigned_to||'free')}" data-t="${esc(l.tier)}" data-r="${esc(l.region)}"><td><input type="checkbox" value="${l.id}" aria-label="Select ${esc(l.business_name)}" style="width:auto"></td>${leadCells(l)}<td>${l.assigned_to?esc(nameOf[l.assigned_to]||'caller'):'<span class="mute">–</span>'}</td></tr>`).join('')}</tbody></table></div>`;
+      <div class="bar sel"><button id="selall">Select shown</button><button id="selnone">Clear</button><span id="seln" class="mute small"></span>
+      <label class="small gap" style="margin-top:0;margin-bottom:0" for="to">Assign to</label><select id="to">${callerOpts||'<option value="">No accepted callers</option>'}</select><button class="pri" id="give">Assign selected</button><button id="take">Unassign selected</button></div>
+      <div class="wrap"><table><thead><tr><th></th><th>Phone</th><th>Business</th><th>Town</th><th>Type</th><th class="num">Rating</th><th class="num">Reviews</th><th>Tier</th><th>Held by</th></tr></thead><tbody>${open.map(l=>
+      `<tr data-h="${esc(l.assigned_to||'free')}" data-t="${esc(l.tier)}" data-r="${esc(l.region)}"><td><input type="checkbox" value="${l.id}" aria-label="Select ${esc(l.business_name)}"></td>${leadCells(l)}<td>${l.assigned_to?esc(nameOf[l.assigned_to]||'caller'):'<span class="mute">–</span>'}</td></tr>`).join('')}</tbody></table></div>`;
   }
   view.innerHTML=h;
-  view.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{A.tab=b.dataset.tab;A.note=['',''];drawAdmin()});
+  document.querySelectorAll('#nav [data-tab]').forEach(b=>b.onclick=()=>{const kb=b.matches(':focus-visible');A.tab=b.dataset.tab;A.note=['',''];drawAdmin();scrollTo(0,0);const t=document.getElementById('tab-'+A.tab);if(kb&&t)t.focus()});
+  const rd=document.getElementById('rej'); if(rd)rd.ontoggle=()=>{A.rejOpen=rd.open};
   view.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{b.disabled=true;act(sb.rpc('admin_set_status',{p_caller:b.dataset.id,p_status:b.dataset.status}),b.dataset.status==='accepted'?'Accepted. They start with no leads.':'Done. Any leads they held are unassigned again.')});
   view.querySelectorAll('[data-assign]').forEach(b=>b.onclick=()=>{const n=parseInt(b.previousElementSibling.value,10);if(!(n>0))return;b.disabled=true;
     act(sb.rpc('admin_assign',{p_caller:b.dataset.assign,p_count:n,p_tier:$('#ft').value||null,p_region:$('#fr').value||null}),d=>d===n?`Assigned ${d} leads.`:`Assigned ${d} leads (only ${d} unassigned leads matched).`)});
