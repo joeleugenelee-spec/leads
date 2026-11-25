@@ -123,6 +123,8 @@ td select{height:32px;font-size:13px;width:auto;max-width:180px}td input[type=nu
 #nav{scrollbar-width:none}#nav::-webkit-scrollbar{display:none}.bar.sel select{flex:1 1 100%}.bar.sel #give,.bar.sel #take{flex:1;height:40px}}
 #top.two .in{flex-wrap:wrap}#top.two #nav{order:3;flex:1 1 100%;overflow-x:auto;scrollbar-width:none}#top.two #nav::-webkit-scrollbar{display:none}#top.two #nav button{min-height:44px}@media(max-width:560px){#top.two #vas{max-width:110px!important}}#top.two #tab-leads{margin-left:8px;padding-left:20px;border-left:1px solid var(--line)}
 .docs ul{margin:0 0 8px;padding-left:20px}.docs a{color:var(--link);text-decoration:underline;text-underline-offset:3px}.docs li{margin:0 0 6px}.docs a,.docs .gb{overflow-wrap:anywhere}.fill{background:var(--warmbg);color:var(--warm);padding:1px 5px;border-radius:4px;font-size:.93em}.warn2{max-width:68ch;padding:10px 12px;border-radius:8px;background:var(--warmbg);color:var(--warm);font-size:14px;margin:0 0 16px}#docv .pagehead{max-width:calc(68ch + 34px)}#foot{max-width:1180px;margin:0 auto;padding:0 16px 40px;font-size:13px}
+.pipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px}.pipe button{height:auto;padding:10px 12px;text-align:left;display:block;font-size:13px;color:var(--mute);font-weight:500;white-space:normal}.pipe b{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}.pipe button[aria-pressed=true]{border-color:var(--accent);color:var(--ink);background:var(--panel)}.crmd{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 4px}.crmd h3{font-size:12px;font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin:20px 0 8px}.crmd .goal{font-size:17px;font-weight:600;margin:0;max-width:70ch}.crmd ul,.crmd ol{margin:0;padding-left:20px;max-width:70ch}.crmd li{margin:0 0 6px}.crmd textarea{width:100%;max-width:70ch}.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px 20px;margin:0}.kv dt{font-size:12px;color:var(--mute);margin:0 0 2px}.kv dd{margin:0;font-weight:500;overflow-wrap:anywhere}.tl{list-style:none!important;padding:0!important}.tl li{display:grid;grid-template-columns:170px 1fr;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:14px;margin:0}.tl li:first-child{border-top:0}@media(max-width:560px){.tl li{grid-template-columns:1fr;gap:2px}}
+.bkf textarea{width:100%}.ni .held{font-weight:600}
 </style></head><body><header id="top"><div class="in"><h1>Leads</h1><nav id="nav" aria-label="Sections"></nav><div class="acct"><select id="vas" aria-label="View as" hidden style="width:auto;height:30px;font-size:13px;max-width:190px"></select><span id="who"></span><span id="badge" class="rolebadge" hidden></span><button id="out" hidden>Sign out</button></div></div></header>
 <main>
 <div id="ann"></div>
@@ -172,6 +174,7 @@ async function api(name){
     team_calls:()=>L.filter(l=>tids.has(l.completed_by)&&in30(l.completed_at)).sort((a,b)=>new Date(b.completed_at)-new Date(a.completed_at)).map(l=>({...l,caller_id:l.completed_by,caller:l.completed_by_name})),
     team_earnings:()=>L.filter(l=>l.mgr_id===T&&l.meet==='sale'&&l.customer_paid_at).sort((a,b)=>new Date(b.customer_paid_at)-new Date(a.customer_paid_at)).map(l=>({...l,caller:l.completed_by_name})),
     team_applicants:()=>team.filter(x=>x.status==='pending'),
+    my_notes:()=>(A.notes||[]).filter(n=>{const l=L.find(x=>x.id===n.lead_id);return l&&((l.assigned_to===T&&!l.completed_at)||l.completed_by===T)}),
     my_invite_code:()=>c.invite_code||''}[name];
   return{data:d?d():null,error:d?null:{message:'Not available in this view'}};
 }
@@ -404,7 +407,10 @@ async function showEarnings(){
    :emptyBox('No commission yet. It appears here when Joel closes one of your bookings and the customer pays.'));
 }
 async function showMyLeads(){
-  const [{data,error},bl]=await Promise.all([api('my_leads'),sb.rpc('booking_link')]); if(C.tab!=='leads')return;
+  const [{data,error},bl,nt]=await Promise.all([api('my_leads'),sb.rpc('booking_link'),api('my_notes')]); if(C.tab!=='leads')return;
+  const notes={}; (nt.error?[]:nt.data||[]).forEach(n=>{(notes[n.lead_id]=notes[n.lead_id]||[]).push(n)});   // newest first
+  const fuOf=Object.fromEntries((data||[]).map(l=>[l.id,l.follow_up_at||null])), local=d=>new Date(new Date(d)-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
+  const ni=id=>{const f=fuOf[id],n=(notes[id]||[])[0];return (f?`<div class="reg${new Date(f)<=new Date()?' held':''}">Follow up ${when(f)}${new Date(f)<=new Date()?' · due':''}</div>`:'')+(n?`<div class="reg">Note: ${esc(n.body.length>90?n.body.slice(0,90)+'…':n.body)}</div>`:'')};
   const cal=!bl.error&&/^https:\/\/(calendar\.app\.google|calendar\.google\.com)\//.test(bl.data||'')?bl.data:'';
   if(error){view.innerHTML=`<p class="note bad">${esc(error.message)}</p>`;return}
   const rows=(data||[]).sort(byRank);
@@ -412,7 +418,7 @@ async function showMyLeads(){
   view.innerHTML=GUIDE+`<div class="pagehead"><h2>Your leads</h2><span class="stat" id="cnt"></span></div>
   <div class="bar"><input id="q" type="search" placeholder="Search name, town, type" aria-label="Search your leads"></div><p id="msg" role="status"></p>
   <div class="wrap"><table class="mine"><thead><tr><th>Phone</th><th>Business</th><th>Town</th><th>Type</th><th class="num">Rating</th><th class="num">Reviews</th><th>Tier</th><th>Best time to call</th><th>After the call</th></tr></thead>
-  <tbody>${rows.map(l=>`<tr data-id="${l.id}">${leadCells(l)}<td class="c-time">${esc(l.best_time_to_call)}<div class="reg">${esc(l.local_time_zone)}</div></td><td class="act">${offBtn(l.tries)}</td></tr>`).join('')}</tbody></table></div>`;
+  <tbody>${rows.map(l=>`<tr data-id="${l.id}">${leadCells(l)}<td class="c-time">${esc(l.best_time_to_call)}<div class="reg">${esc(l.local_time_zone)}</div><div class="ni">${ni(l.id)}</div></td><td class="act">${offBtn(l.tries)}</td></tr>`).join('')}</tbody></table></div>`;
   let trs=[...view.querySelectorAll('tbody tr')]; const go=()=>{const s=$('#q').value.toLowerCase();let k=0;trs.forEach(r=>{const ok=r.textContent.toLowerCase().includes(s);r.hidden=!ok;if(ok)k++});$('#cnt').textContent=k+' of '+trs.length+' leads'};
   $('#q').oninput=go;go();wireGuide();
   const tries=Object.fromEntries(rows.map(l=>[l.id,l.tries||0]));
@@ -420,6 +426,14 @@ async function showMyLeads(){
     const b=e.target.closest('button'); if(!b)return; const tr=b.closest('tr'), cell=b.closest('td'), id=+tr.dataset.id, biz=tr.children[1].textContent.trim();
     if('done' in b.dataset){cell.innerHTML='<button class="pri" data-book>Booked a call</button> <button data-res="no_answer">No answer</button> <button data-res="not_booked">No booking</button> <button class="link" data-cancel>Cancel</button>';return}
     if('cancel' in b.dataset){cell.innerHTML=offBtn(tries[id]);return}
+    if('note' in b.dataset){cell.innerHTML=`<div class="bkf"><textarea class="nb" rows="2" maxlength="2000" placeholder="Note: what they said, what to do next" aria-label="Note"></textarea><span class="reg">Call back on (optional)</span><input class="nf" type="datetime-local" value="${fuOf[id]?local(fuOf[id]):''}" aria-label="Follow-up day and time"><button class="pri" data-nsave>Save</button><button class="link" data-cancel>Cancel</button></div>`;cell.querySelector('.nb').focus();return}
+    if('nsave' in b.dataset){const t=cell.querySelector('.nb').value.trim(),f=cell.querySelector('.nf').value,fw=f?new Date(f).toISOString():null,fch=(fw||'')!==(fuOf[id]?new Date(fuOf[id]).toISOString():'');
+      if(!t&&!fch)return say($('#msg'),'Write a note or pick a call-back time first.','bad');
+      cell.querySelectorAll('button').forEach(x=>x.disabled=true);
+      const r1=t?await sb.rpc('add_lead_note',{p_lead:id,p_body:t}):{}, r2=fch?await sb.rpc('set_lead_followup',{p_lead:id,p_when:fw}):{}, er=r1.error||r2.error;
+      if(er){say($('#msg'),er.message,'bad');cell.innerHTML=offBtn(tries[id]);return}
+      if(t)(notes[id]=notes[id]||[]).unshift({body:t}); if(fch)fuOf[id]=fw;
+      tr.querySelector('.ni').innerHTML=ni(id); cell.innerHTML=offBtn(tries[id]); return say($('#msg'),'Saved for '+biz+'.','ok')}
     if('book' in b.dataset){cell.innerHTML='<div class="bkf">'+(cal?`<a class="calbtn" href="${esc(cal)}" target="_blank" rel="noopener">1. Pick a time on Joel's calendar</a><span class="reg">Book it there with the owner's name and email, so Google sends them the Meet invite. Then fill in the same details here.</span>`:'')+'<input class="bn" maxlength="120" placeholder="Owner\'s name" aria-label="Owner\'s name"><input class="be" type="email" maxlength="200" placeholder="Their email, for the Meet invite" aria-label="Their email"><input class="bw" type="datetime-local" aria-label="Meet day and time"><button class="pri" data-res="booked">Save booking</button><button class="link" data-cancel>Cancel</button></div>';cell.querySelector('.bn').focus();return}
     if(!('res' in b.dataset))return; const res=b.dataset.res, args={p_lead:id,p_outcome:res};
     if(res==='booked'){const n=cell.querySelector('.bn').value.trim(),w=cell.querySelector('.bw').value;
@@ -434,7 +448,7 @@ async function showMyLeads(){
     if(!trs.length)return showMyLeads(); go();
   };
 }
-const offBtn=n=>'<button data-done>Check off</button>'+(n?` <span class="reg">tried ${n}×</span>`:'');
+const offBtn=n=>'<button data-done>Check off</button> <button data-note>Note</button>'+(n?` <span class="reg">tried ${n}×</span>`:'');
 
 /* ---------- manager: their own team only ---------- */
 let M={tab:'team',fc:'',fs:''};
@@ -491,9 +505,10 @@ let A={tab:'people',callers:[],leads:[],ranks:[],invites:[],mgrRate:5,note:['','
 async function loadAdmin(){
   const [c,l,r,i,p,an]=await Promise.all([sb.from('callers').select('*').order('applied_at',{ascending:false}),fetchAll('leads'),sb.from('ranks').select('*').order('pos'),sb.from('invites').select('*').order('created_at'),sb.from('pay_settings').select('*'),sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(50)]);
   const error=c.error||l.error||r.error||i.error||p.error||an.error; if(error)return{error};
-  return{callers:c.data,leads:l.data.sort(byRank),ranks:r.data,invites:i.data,mgrRate:p.data[0]?+p.data[0].mgr_rate:5,bookUrl:(p.data[0]&&p.data[0].booking_url)||'',anns:an.data};
+  const [nt,ins]=await Promise.all([sb.from('lead_notes').select('*').order('created_at',{ascending:false}).limit(2000),sb.from('insights').select('*').order('created_at',{ascending:false}).limit(1)]);   // CRM extras; absent tables just leave these empty
+  return{callers:c.data,leads:l.data.sort(byRank),ranks:r.data,invites:i.data,mgrRate:p.data[0]?+p.data[0].mgr_rate:5,bookUrl:(p.data[0]&&p.data[0].booking_url)||'',anns:an.data,notes:nt.error?[]:nt.data,insight:ins.error?null:(ins.data[0]||null)};
 }
-const putAdmin=d=>{A.callers=d.callers;A.leads=d.leads;A.ranks=d.ranks;A.invites=d.invites;A.mgrRate=d.mgrRate;A.bookUrl=d.bookUrl;A.anns=d.anns};
+const putAdmin=d=>{A.callers=d.callers;A.leads=d.leads;A.ranks=d.ranks;A.invites=d.invites;A.mgrRate=d.mgrRate;A.bookUrl=d.bookUrl;A.anns=d.anns;A.notes=d.notes||[];A.insight=d.insight||null};
 async function showAdmin(){
   view.innerHTML=LOADING;
   const d=await loadAdmin(); if(d.error)return fail(d.error);
@@ -501,7 +516,7 @@ async function showAdmin(){
 }
 /* Live updates: every few seconds the admin panel re-reads the data and redraws only if something changed,
    keeping filters, typed numbers, ticked leads and scroll position. */
-const sig=()=>JSON.stringify([A.callers.map(c=>[c.id,c.status,c.full_name,c.role,c.manager_id,c.mgr_rate,c.also_caller]),A.leads.map(l=>[l.id,l.assigned_to,l.completed_at,l.outcome,l.meet,l.sale_amount,l.customer_paid_at,l.comm_paid_at,l.mgr_paid_at]),A.ranks,A.invites,A.mgrRate,A.bookUrl,A.anns]);
+const sig=()=>JSON.stringify([A.callers.map(c=>[c.id,c.status,c.full_name,c.role,c.manager_id,c.mgr_rate,c.also_caller]),A.leads.map(l=>[l.id,l.assigned_to,l.completed_at,l.outcome,l.meet,l.sale_amount,l.customer_paid_at,l.comm_paid_at,l.mgr_paid_at]),A.ranks,A.invites,A.mgrRate,A.bookUrl,A.anns,(A.notes||[]).length,A.insight&&A.insight.id,A.leads.map(l=>l.follow_up_at||0)]);
 async function poll(){
   if(!A.live||A.busy||document.hidden||!user||VA)return;
   const d=await loadAdmin();
@@ -535,6 +550,62 @@ async function act(promise,okText){
     await showAdmin();
   }finally{A.busy=false}
 }
+
+/* ---------- CRM: every lead as a contact record, with a pipeline, notes, follow-ups and the hourly analysis ---------- */
+const CRM={stage:'',q:'',due:false,open:null};
+const STAGES=[['new','New'],['held','With a caller'],['tried','Tried, no answer'],['booked','Meet booked'],['sold','Sold, awaiting payment'],['cust','Customer'],['notint','Not interested'],['nosale','No sale'],['noshow','No show']];
+const stageOf=l=>!l.completed_at?(!l.assigned_to?'new':l.tries>0?'tried':'held'):l.outcome!=='booked'?'notint':!l.meet?'booked':l.meet==='nosale'?'nosale':l.meet==='noshow'?'noshow':l.customer_paid_at?'cust':'sold';
+const stageName=k=>(STAGES.find(s=>s[0]===k)||[,''])[1], stageCls=k=>k==='cust'?'ok':k==='booked'?'warm':k==='sold'?'cold':'no';
+const fuLive=l=>!!l.follow_up_at&&!['notint','nosale','cust'].includes(stageOf(l)), fuDue=l=>fuLive(l)&&new Date(l.follow_up_at)<=new Date();   // a follow-up stops counting once the lead is closed
+const lastTouch=l=>[l.customer_paid_at,l.meet_at,l.completed_at,l.assigned_at].find(Boolean)||null;
+const ago=d=>{const m=Math.max(0,Math.round((Date.now()-new Date(d))/6e4));return m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' d ago'};
+function crmHTML(nameOf){
+  const L=A.leads, n={}; L.forEach(l=>{const k=stageOf(l);n[k]=(n[k]||0)+1});
+  const I=A.insight, pts=I&&Array.isArray(I.points)?I.points:[], acts=I&&Array.isArray(I.actions)?I.actions:[];
+  let h=`<section class="sec"><div class="pagehead"><h2>Analysis</h2><span class="stat">${I?'updated '+ago(I.created_at):'not running yet'}</span></div>`+
+   (I?`<div class="crmd ins"><p class="goal">${esc(I.headline||'')}</p>${pts.length?`<h3>What the numbers say</h3><ul>${pts.map(p=>`<li><b>${esc(p.title||'')}</b> ${esc(p.detail||'')}</li>`).join('')}</ul>`:''}${acts.length?`<h3>Do next</h3><ol>${acts.map(a=>`<li>${esc(a)}</li>`).join('')}</ol>`:''}<p class="mute small">Written by Claude from totals only (no phone numbers or emails are sent). Refreshes every hour.</p></div>`
+     :`<div class="crmd"><p class="mute">Once the hourly analysis is switched on, Claude's read of your funnel and what to do next appears here.</p></div>`)+'</section>';
+  h+=`<section class="sec"><div class="pagehead"><h2>Pipeline</h2><span class="stat">${L.length} contacts</span></div><div class="pipe">${STAGES.map(([k,t])=>`<button data-stage="${k}" aria-pressed="${CRM.stage===k}"><b>${n[k]||0}</b>${t}</button>`).join('')}</div></section>`;
+  const q=CRM.q.toLowerCase(), now=new Date();
+  const rows=L.filter(l=>(!CRM.stage||stageOf(l)===CRM.stage)&&(!CRM.due||fuDue(l))&&(!q||[l.business_name,l.city,l.category,l.bk_name,l.phone].some(v=>String(v||'').toLowerCase().includes(q))))
+    .sort((a,b)=>(fuLive(a)?0:1)-(fuLive(b)?0:1)||(fuLive(a)&&fuLive(b)?new Date(a.follow_up_at)-new Date(b.follow_up_at):0)||new Date(lastTouch(b)||0)-new Date(lastTouch(a)||0));
+  const O=CRM.open!=null&&L.find(l=>l.id===CRM.open);
+  if(O){
+    const ev=[]; const add=(d,t)=>{if(d)ev.push([d,t,0])};
+    add(O.assigned_at,`Assigned to ${esc(nameOf[O.assigned_to]||O.completed_by_name||'a caller')}`);
+    add(O.completed_at,O.outcome==='booked'?`${esc(O.completed_by_name||'Caller')} booked a Meet${O.bk_name?' with '+esc(O.bk_name):''}${O.bk_when?' for '+when(O.bk_when):''}`:`${esc(O.completed_by_name||'Caller')} marked it not interested`);
+    add(O.meet_at,O.meet==='sale'?`Sale closed for ${money(O.sale_amount)}`:O.meet==='nosale'?'Meet held, no sale':'Owner did not show');
+    add(O.customer_paid_at,'Customer paid'); add(O.comm_paid_at,'Caller commission paid out');
+    (A.notes||[]).filter(x=>x.lead_id===O.id).forEach(x=>ev.push([x.created_at,esc(x.body),x.author_name||'Admin']));
+    ev.sort((a,b)=>new Date(b[0])-new Date(a[0]));
+    const fu=O.follow_up_at?new Date(new Date(O.follow_up_at)-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16):'';
+    h+=`<section class="sec" id="crmopen"><div class="pagehead"><h2>${esc(O.business_name)}</h2><button data-crmclose>Close</button></div><div class="crmd">
+     <dl class="kv"><div><dt>Stage</dt><dd><span class="tier plain ${stageCls(stageOf(O))}">${stageName(stageOf(O))}</span></dd></div><div><dt>Phone</dt><dd>${esc(O.phone||'–')}</dd></div><div><dt>Where</dt><dd>${esc(O.city||'')}${O.region?', '+esc(O.region):''}</dd></div><div><dt>Type</dt><dd>${esc(O.category||'–')}</dd></div>
+     <div><dt>Owner</dt><dd>${esc(O.bk_name||'–')}${O.bk_email?`<div class="reg">${esc(O.bk_email)}</div>`:''}</dd></div><div><dt>Caller</dt><dd>${esc(nameOf[O.assigned_to]||O.completed_by_name||'Unassigned')}</dd></div><div><dt>Unanswered tries</dt><dd>${O.tries||0}</dd></div><div><dt>Google</dt><dd>${esc(O.google_rating||'–')} · ${esc(O.google_reviews??'–')} reviews</dd></div></dl>
+     <h3>Follow-up</h3><div class="bar"><input id="crmfu" type="datetime-local" value="${fu}" aria-label="Follow-up date and time"><button class="pri" id="crmfusave">Save follow-up</button>${O.follow_up_at?'<button id="crmfuclear">Clear</button>':''}</div>
+     <h3>Add a note</h3><textarea id="crmnote" rows="2" maxlength="2000" placeholder="What happened, what they said, what to do next"></textarea><div class="row top"><button class="pri" id="crmnotesave">Save note</button></div>
+     <h3>History</h3>${ev.length?`<ul class="tl">${ev.map(([d,t,nt])=>`<li><span class="mute">${when(d)}</span><span>${nt?`<b>Note by ${esc(nt)}</b> `:''}${t}</span></li>`).join('')}</ul>`:'<p class="mute">Nothing has happened with this lead yet.</p>'}</div></section>`;
+  }
+  h+=`<section class="sec"><div class="pagehead"><h2>Contacts</h2><span class="stat">${rows.length} shown</span></div><div class="bar"><input id="crmq" type="search" placeholder="Search business, town, type, owner, phone" value="${esc(CRM.q)}" aria-label="Search contacts" style="flex:1;min-width:200px;max-width:360px">
+   <select id="crmst" aria-label="Stage"><option value="">Every stage</option>${STAGES.map(([k,t])=>`<option value="${k}"${CRM.stage===k?' selected':''}>${t}</option>`).join('')}</select>
+   <label class="small" style="margin:0;display:flex;gap:6px;align-items:center"><input type="checkbox" id="crmdue"${CRM.due?' checked':''} style="width:auto;height:auto"> Follow-ups due</label></div>`+
+   (rows.length?tbl(['Business','Stage','Owner','Caller','Last activity','Follow-up',''],rows.slice(0,150).map(l=>{const lt=lastTouch(l),od=fuDue(l);
+     return `<tr><td><div class="nm">${esc(l.business_name)}</div><div class="reg">${esc(l.city||'')} · ${esc(l.category||'')}</div></td><td><span class="tier plain ${stageCls(stageOf(l))}">${stageName(stageOf(l))}</span></td><td>${esc(l.bk_name||'–')}</td><td>${esc(nameOf[l.assigned_to]||l.completed_by_name||'–')}</td><td>${lt?ago(lt):'<span class="mute">–</span>'}</td><td>${fuLive(l)?`<span class="${od?'held':''}">${when(l.follow_up_at)}${od?' · due':''}</span>`:'<span class="mute">–</span>'}</td><td class="act end"><button data-crmopen="${l.id}">Open</button></td></tr>`}),'stack')+(rows.length>150?`<p class="mute small">Showing the first 150. Narrow it with the search or a stage.</p>`:'')
+    :emptyBox('No contacts match.'))+'</section>';
+  return h;
+}
+function crmWire(){
+  const re=()=>{const y=scrollY;drawAdmin();scrollTo(0,y)};
+  view.querySelectorAll('[data-stage]').forEach(b=>b.onclick=()=>{CRM.stage=CRM.stage===b.dataset.stage?'':b.dataset.stage;re()});
+  $('#crmst').onchange=e=>{CRM.stage=e.target.value;re()}; $('#crmdue').onchange=e=>{CRM.due=e.target.checked;re()};
+  $('#crmq').oninput=e=>{CRM.q=e.target.value;const p=e.target.selectionStart;re();const i=$('#crmq');i.focus();i.setSelectionRange(p,p)};
+  view.querySelectorAll('[data-crmopen]').forEach(b=>b.onclick=()=>{CRM.open=+b.dataset.crmopen;drawAdmin();const o=document.getElementById('crmopen');if(o)o.scrollIntoView({block:'start'})});
+  const c=view.querySelector('[data-crmclose]'); if(!c)return; c.onclick=()=>{CRM.open=null;re()};
+  $('#crmnotesave').onclick=()=>{const t=$('#crmnote').value.trim();if(!t)return say($('#note'),'Write the note first.','bad');act(sb.rpc('add_lead_note',{p_lead:CRM.open,p_body:t}),'Note saved.')};
+  const fu=v=>act(sb.rpc('set_lead_followup',{p_lead:CRM.open,p_when:v}),v?'Follow-up saved.':'Follow-up cleared.');
+  $('#crmfusave').onclick=()=>{const v=$('#crmfu').value;if(!v)return say($('#note'),'Pick a date and time first.','bad');fu(new Date(v).toISOString())};
+  const cl=$('#crmfuclear'); if(cl)cl.onclick=()=>fu(null);
+}
 function drawAdmin(){
   const done=A.leads.filter(l=>l.completed_at).sort((a,b)=>new Date(b.completed_at)-new Date(a.completed_at)), open=A.leads.filter(l=>!l.completed_at);
   const held={}; open.forEach(l=>{if(l.assigned_to)held[l.assigned_to]=(held[l.assigned_to]||0)+1});
@@ -547,8 +618,10 @@ function drawAdmin(){
   const nameOf=Object.fromEntries(A.callers.map(c=>[c.id,c.full_name]));
   const regions=[...new Set(A.leads.map(l=>l.region).filter(Boolean))].sort();
   const callerOpts=accepted.map(c=>`<option value="${esc(c.id)}">${esc(c.full_name)} (${held[c.id]||0})</option>`).join('');
+  const due=A.leads.filter(fuDue).length;
   const cur=t=>A.tab===t?' aria-current="page"':'';
   $('#nav').innerHTML=`<button id="tab-over" data-tab="over"${cur('over')}>Overview</button>
+  <button id="tab-crm" data-tab="crm"${cur('crm')}>CRM${due?`<span class="badge new">${due} due</span>`:''}</button>
   <button id="tab-people" data-tab="people"${cur('people')}>People${pending.length?`<span class="badge new">${pending.length} waiting</span>`:''}</button>
   <button id="tab-leads" data-tab="leads"${cur('leads')}>Leads<span class="badge">${open.length}</span></button>
   <button id="tab-meets" data-tab="meets"${cur('meets')}>Meets and sales${waiting.length?`<span class="badge new">${waiting.length}</span>`:''}</button>
@@ -558,7 +631,8 @@ function drawAdmin(){
   <button id="tab-ann" data-tab="ann"${cur('ann')}>Announcements${(A.anns||[]).length?`<span class="badge">${A.anns.length}</span>`:''}</button>`;
   let h=`<dl class="sum"><div><dt>Leads</dt><dd>${A.leads.length}</dd></div><div><dt>Unassigned</dt><dd>${free}</dd></div><div><dt>With callers</dt><dd>${open.length-free}</dd></div><div><dt>Completed</dt><dd>${done.length}</dd></div></dl>
   <p class="note ${A.note[1]}" id="note" role="status">${esc(A.note[0])}</p>`;
-  if(A.tab==='ann'){
+  if(A.tab==='crm'){h+=crmHTML(nameOf)}
+  else if(A.tab==='ann'){
     const aud={all:'Everyone',callers:'Cold callers only',managers:'Managers only'};
     h+=`<div class="pagehead"><h2>New announcement</h2></div><p class="mute small">Shown at the top of the page for everyone you choose, until you remove it. Nothing is emailed or texted.</p>
     <div class="card" style="margin:0 0 32px;max-width:640px"><label for="annb" style="margin-top:0">Announcement</label><textarea id="annb" maxlength="2000" placeholder="What do you want everyone to know?"></textarea>
@@ -638,6 +712,7 @@ function drawAdmin(){
       `<tr data-h="${esc(l.assigned_to||'free')}" data-t="${esc(l.tier)}" data-r="${esc(l.region)}"><td><input type="checkbox" value="${l.id}" aria-label="Select ${esc(l.business_name)}"></td>${leadCells(l)}<td>${l.assigned_to?esc(nameOf[l.assigned_to]||'caller'):'<span class="mute">–</span>'}</td></tr>`).join('')}</tbody></table></div>`;
   }
   view.innerHTML=h;
+  if(A.tab==='crm')crmWire();
   document.querySelectorAll('#nav [data-tab]').forEach(b=>b.onclick=()=>{const kb=b.matches(':focus-visible');A.tab=b.dataset.tab;A.note=['',''];drawAdmin();scrollTo(0,0);const t=document.getElementById('tab-'+A.tab);if(kb&&t)t.focus()});
   const rd=document.getElementById('rej'); if(rd)rd.ontoggle=()=>{A.rejOpen=rd.open};
   view.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{b.disabled=true;act(sb.rpc('admin_set_status',{p_caller:b.dataset.id,p_status:b.dataset.status}),b.dataset.status==='accepted'?'Accepted. They start with no leads.':'Done. Any leads they held are unassigned again.')});
