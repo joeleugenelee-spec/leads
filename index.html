@@ -63,7 +63,7 @@ const tierRank={hot:0,warm:1,cold:2};
 const byRank=(a,b)=>(tierRank[a.tier]??3)-(tierRank[b.tier]??3)||(b.google_reviews||0)-(a.google_reviews||0)||a.id-b.id;
 
 async function route(){
-  if(recovering)return; head();
+  A.live=false; if(recovering)return; head();
   if(!user)return showAuth();
   view.innerHTML='<p class="mute">Loading…</p>';
   const {data,error}=await sb.rpc('my_state');
@@ -144,17 +144,48 @@ async function showMyLeads(){
 }
 
 /* ---------- admin ---------- */
-let A={tab:'people',callers:[],leads:[],note:['','']};
+let A={tab:'people',callers:[],leads:[],note:['',''],live:false,busy:false,dirty:false};
 async function showAdmin(){
   view.innerHTML='<p class="mute">Loading…</p>';
   const [c,l]=await Promise.all([sb.from('callers').select('*').order('applied_at',{ascending:false}),sb.from('leads').select('*').limit(10000)]);
   if(c.error||l.error){view.innerHTML=`<p class="note bad">${esc((c.error||l.error).message)}</p>`;return}
-  A.callers=c.data; A.leads=l.data.sort(byRank); drawAdmin();
+  A.callers=c.data; A.leads=l.data.sort(byRank); A.live=true; A.dirty=false; drawAdmin();
 }
+/* Live updates: every few seconds the admin panel re-reads the data and redraws only if something changed,
+   keeping filters, typed numbers, ticked leads and scroll position. */
+const sig=()=>JSON.stringify([A.callers.map(c=>[c.id,c.status,c.full_name]),A.leads.map(l=>[l.id,l.assigned_to,l.completed_at,l.outcome])]);
+async function poll(){
+  if(!A.live||A.busy||document.hidden||!user)return;
+  const [c,l]=await Promise.all([sb.from('callers').select('*').order('applied_at',{ascending:false}),sb.from('leads').select('*').limit(10000)]);
+  if(c.error||l.error||!A.live||A.busy)return;
+  const before=sig(); A.callers=c.data; A.leads=l.data.sort(byRank);
+  if(sig()!==before)A.dirty=true;
+  if(!A.dirty)return;
+  if(document.activeElement&&document.activeElement.tagName==='SELECT'&&view.contains(document.activeElement))return;   // a menu may be open; redraw on the next tick
+  A.dirty=false; redrawKeep();
+}
+function redrawKeep(){
+  const ids=['ft','fr','lh','lt','lr','lq','to','dw','do','dq'], val={}; ids.forEach(i=>{const e=document.getElementById(i);if(e)val[i]=e.value});
+  const ticked=new Set([...view.querySelectorAll('tbody input[type=checkbox]:checked')].map(b=>b.value));
+  const nums={}; view.querySelectorAll('[data-assign]').forEach(b=>nums[b.dataset.assign]=b.previousElementSibling.value);
+  const ae=document.activeElement, focusId=ae&&ae.id, focusNum=ae&&ae.type==='number'&&ae.nextElementSibling?ae.nextElementSibling.dataset.assign:null, y=scrollY;
+  drawAdmin();
+  ids.forEach(i=>{const e=document.getElementById(i);if(e&&i in val&&[...(e.options||[{value:val[i]}])].some(o=>o.value===val[i]))e.value=val[i]});
+  view.querySelectorAll('[data-assign]').forEach(b=>{if(nums[b.dataset.assign]!=null)b.previousElementSibling.value=nums[b.dataset.assign]});
+  const first=document.getElementById('lh')||document.getElementById('dw'); if(first)first.dispatchEvent(new Event('change'));
+  if(ticked.size){view.querySelectorAll('tbody input[type=checkbox]').forEach(b=>{if(ticked.has(b.value)&&!b.closest('tr').hidden)b.checked=true});const tb=view.querySelector('tbody');if(tb)tb.dispatchEvent(new Event('change'))}
+  if(focusId&&document.getElementById(focusId))document.getElementById(focusId).focus();
+  else if(focusNum){const b=view.querySelector(`[data-assign="${focusNum}"]`);if(b)b.previousElementSibling.focus()}
+  scrollTo(0,y);
+}
+setInterval(poll,4000);
 async function act(promise,okText){
-  const {data,error}=await promise;
-  A.note=error?[error.message,'bad']:[typeof okText==='function'?okText(data):okText,'ok'];
-  await showAdmin();
+  A.busy=true;
+  try{
+    const {data,error}=await promise;
+    A.note=error?[error.message,'bad']:[typeof okText==='function'?okText(data):okText,'ok'];
+    await showAdmin();
+  }finally{A.busy=false}
 }
 function drawAdmin(){
   const done=A.leads.filter(l=>l.completed_at).sort((a,b)=>new Date(b.completed_at)-new Date(a.completed_at)), open=A.leads.filter(l=>!l.completed_at);
