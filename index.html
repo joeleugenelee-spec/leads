@@ -113,6 +113,7 @@ td select{height:32px;font-size:13px;width:auto;max-width:180px}td input[type=nu
 .guide li b{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);padding-top:3px}.guide li.me{background:var(--panel)}.guide li.me b{color:var(--ink)}
 .guide li span{font-weight:600}.guide li small{grid-column:2;font-size:13px;color:var(--mute)}
 .guide .say{margin:0 0 8px;padding:12px 14px;background:var(--panel);border-radius:8px;font-size:15px;line-height:1.5}.guide p{margin:0 0 8px}
+.guide .steps2{border:0;display:grid;gap:14px}.guide .steps2 li{display:block;padding:0;border:0}.guide .steps2 li b{display:block;font-family:inherit;font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink);padding:0;margin:0 0 6px}.guide .steps2 .say{display:block;font-weight:400}.guide .steps2 small{display:block;margin-top:6px}
 .guide .warn{padding:10px 12px;border-radius:8px;background:var(--warmbg);color:var(--warm);font-size:14px;margin:8px 0 0}
 @media (max-width:760px){.mine .ph a{text-decoration:none;font-family:var(--mono);font-weight:600}.mine .c-biz a{text-decoration:none}.mine .c-biz{flex:1 1 calc(100% - 90px)}
 .stack thead{display:none}.stack,.stack tbody{display:block}.stack tr{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:14px;border-bottom:1px solid var(--line)}.stack tr:last-child{border-bottom:0}
@@ -269,22 +270,28 @@ async function showApply(){
     if(error)return say($('#msg'),error.message,'bad'); try{localStorage.removeItem('teamCode')}catch(e){} route()};
 }
 
-const GUIDE=`<details class="guide" id="guide"><summary>Your job, in one minute</summary><div class="gb">
-<h3>Your one goal</h3><p class="goal">Book a Google Meet between the business owner and Joel.</p>
-<p class="mute">That is the whole job. You do not sell, talk price or take payment. Joel is the closer.</p>
+const GUIDE=`<details class="guide" id="guide"><summary>Your job and the call script</summary><div class="gb">
+<h3>Your one goal</h3><p class="goal">Book a 15-minute Google Meet between the business owner and the manager.</p>
+<p class="mute">That is the whole job. You do not sell, talk price or take payment. The manager is the closer.</p>
 <h3>Who does what</h3><ol>
-<li class="me"><b>Top</b><span>You, the cold caller</span><small>Call the business and book a Google Meet with Joel.</small></li>
-<li><b>Middle</b><span>Joel</span><small>Meets everyone who booked and shows them the website.</small></li>
-<li><b>Bottom</b><span>Joel</span><small>Closes the sale and takes the payment. If the sale closes, you earn your commission.</small></li></ol>
-<h3>What to say</h3>
-<p class="say">"Hi, is this the owner of [business]? I'm [your name]. We build websites for local businesses like yours. Joel, who makes them, can show you yours on a quick Google Meet. Would [day] at [time] work?"</p>
-<p class="mute small">If a demo website already exists for that business, say this instead:</p>
-<p class="say">"We've already made a demo website for [business]. Joel can walk you through it on a quick Google Meet. Would [day] at [time] work?"</p>
-<p class="warn">Only say a demo website has already been made when Joel has confirmed one exists for that business. If you are not sure, use the first version.</p>
-<h3>After the call</h3>
-<p><b>They said yes:</b> press Check off, then "Booked a call". Pick a free time on Joel's calendar with the owner still on the phone, then fill in their name, email and that day and time here. The booking stays yours.</p>
+<li class="me"><b>Top</b><span>You, the cold caller</span><small>Call the business and book a Google Meet with the manager.</small></li>
+<li><b>Middle</b><span>The manager</span><small>Meets everyone who booked and shows them the website.</small></li>
+<li><b>Bottom</b><span>The manager</span><small>Closes the sale and takes the payment. If the sale closes, you earn your commission.</small></li></ol>
+<h3>Before you dial</h3>
+<p>Open the business's link and check it has no website. Only say you could not find one if that is true.</p>
+<h3>The call, step by step</h3>
+<ol class="steps2">
+<li><b>1. Open like a person, not a pitch.</b><span class="say">"Hey, is this [owner's name]? It's [your name]. Quick one: I was looking up [business] online. Where do your customers usually find you right now?"</span><small>Do not ask for "30 seconds of your time". Ask the question and listen.</small></li>
+<li><b>2. Name the gap you saw.</b><span class="say">"Got it. When I searched, I found your Google listing but no website. If I'm picking between you and a competitor with a site and more reviews, what makes me call you? Is that something you run into, or not really?"</span><small>Most will say "we're word of mouth". That is fine. Do not argue.</small></li>
+<li><b>3. Take the pressure off, then ask about growth.</b><span class="say">"Fair enough, this may not even be relevant for you. Let me ask one thing: if a few more customers came in each week, could you handle that, or would it be too much right now?"</span><small>You are asking, not pitching. If they say they are full, thank them and move on.</small></li>
+<li><b>4. Assume the meeting.</b><span class="say">"Then it's worth 15 minutes. We build websites for businesses like yours, and our manager can show you what one would look like for [business] on a quick Google Meet. Worst case, you see what's possible. Are mornings or afternoons better for you?"</span><small>Offer two choices, not a yes or no. Pick the earliest free slot on the manager's calendar, today or tomorrow if you can.</small></li>
+<li><b>5. Lock it in.</b><span class="say">"Great, I've got [day] at [time]. What's the best email for the invite? You'll get a Google Meet link from our manager."</span><small>Then press Check off and "Booked a call" and fill in their name, email and the time. The booking stays yours.</small></li></ol>
+<h3>If they ask</h3>
+<p><b>"How much is it?"</b> "Our manager goes through that on the Meet once they've seen what you need. I just set up the time."</p>
+<p><b>"Send me an email instead."</b> "Happy to. It's quicker to see it, though, and it's only 15 minutes. Does [day] morning work?"</p>
+<p><b>"Not interested."</b> Thank them, then press Check off and "No booking". Never push past a clear no, and if they ask not to be called again, do not call again.</p>
 <p><b>Nobody picked up:</b> press Check off, then "No answer". It stays on your list to try again.</p>
-<p><b>They said no:</b> thank them, then press Check off and "No booking".</p></div></details>`;
+<p class="warn">Keep it true. Do not say a website has already been made for them unless the manager has confirmed one exists for that business. Do not make up search results, numbers or reasons to rush. Do not promise they will make more money.</p></div></details>`;
 function wireGuide(){const g=document.getElementById('guide');if(!g)return;let shut=false;try{shut=localStorage.getItem('guideShut')==='1'}catch(e){}g.open=!shut;g.ontoggle=()=>{try{localStorage.setItem('guideShut',g.open?'0':'1')}catch(e){}}}
 let C={tab:'leads'};
 function showCaller(){
