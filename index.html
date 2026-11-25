@@ -101,7 +101,9 @@ button.link{text-decoration:underline;text-decoration-color:var(--line);text-und
 .steps .n{font-family:var(--mono);font-size:12px;color:var(--mute)}.steps .nm2{font-weight:600}.steps small{grid-column:2/-1;color:var(--mute);font-size:13px}.steps .r{font-family:var(--mono);font-weight:600}
 .steps li.here{background:var(--panel)}.here .nm2::after{content:"You are here";margin-left:8px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:2px 6px;border-radius:5px;background:var(--hl);color:var(--hl-ink)}
 .fun{margin:0 0 24px}.fr{margin:0 0 16px}.fr:last-child{margin:0;padding-top:14px;border-top:1px solid var(--line)}.fr .l{font-size:14px}.fr .track{height:14px;border-radius:5px}.fr .track i{border-radius:5px}
-.bkf{display:grid;gap:6px;min-width:230px;white-space:normal}.bkf input{height:34px;font-size:13px}
+.banner{background:var(--warmbg);color:var(--warm);padding:10px 14px;border-radius:8px;font-size:14px;margin:0 0 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.annc{background:var(--surface);border:1px solid var(--ring);border-radius:10px;padding:12px 16px;margin:0 0 16px}.annc h3{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin:0 0 6px;display:flex;justify-content:space-between;gap:12px}.annc p{margin:0;white-space:pre-line;max-width:75ch;overflow-wrap:anywhere}
+.bkf{display:grid;gap:6px;min-width:230px;white-space:normal}.calbtn{display:flex;align-items:center;justify-content:center;min-height:36px;padding:4px 12px;border-radius:7px;border:1px solid var(--ring);color:var(--ink);font-weight:600;font-size:13px;text-align:center}.calbtn:hover{background:var(--panel);text-decoration:none}.bkf input{height:34px;font-size:13px}
 td select{height:32px;font-size:13px;width:auto;max-width:180px}td input[type=number]{height:32px}
 .guide{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin:0 0 20px}
 .guide summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px}.guide .gb{padding:0 16px 16px;max-width:68ch}
@@ -118,8 +120,9 @@ td select{height:32px;font-size:13px;width:auto;max-width:180px}td input[type=nu
 .stack td.act{flex-basis:100%;white-space:normal}.stack td.end{display:flex;gap:8px}.stack td.act button{height:40px}.stack td.end button{flex:1}.stack .grp input{flex:1;height:40px}.stack .grp button{flex:1}
 #top .in{flex-wrap:wrap}.rank{grid-template-columns:1fr}.sum.s3{grid-template-columns:1fr}.sum.s3 div{border-left:0;border-top:1px solid var(--line)}.sum.s3 div:first-child{border-top:0}.acct{gap:8px}#who{display:none}.rolebadge i{display:none}.mine td.act .bkf{width:100%}.mine td.act .bkf button{flex:none}
 #nav{scrollbar-width:none}#nav::-webkit-scrollbar{display:none}.bar.sel select{flex:1 1 100%}.bar.sel #give,.bar.sel #take{flex:1;height:40px}}
-</style></head><body><header id="top"><div class="in"><h1>Leads</h1><nav id="nav" aria-label="Sections"></nav><div class="acct"><span id="who"></span><span id="badge" class="rolebadge" hidden></span><button id="out" hidden>Sign out</button></div></div></header>
+</style></head><body><header id="top"><div class="in"><h1>Leads</h1><nav id="nav" aria-label="Sections"></nav><div class="acct"><select id="vas" aria-label="View as" hidden style="width:auto;height:30px;font-size:13px;max-width:190px"></select><span id="who"></span><span id="badge" class="rolebadge" hidden></span><button id="out" hidden>Sign out</button></div></div></header>
 <main>
+<div id="ann"></div>
 <div id="view"><div class="skel" aria-label="Loading"><i></i><i></i><i></i></div></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
@@ -128,6 +131,7 @@ td select{height:32px;font-size:13px;width:auto;max-width:180px}td input[type=nu
 const $=s=>document.querySelector(s), view=$('#view');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const here=location.origin+location.pathname;
+const teamCode=(()=>{let c=new URLSearchParams(location.search).get('team')||'';c=/^[a-z0-9]{8,40}$/i.test(c)?c:'';try{if(c)localStorage.setItem('teamCode',c);else c=localStorage.getItem('teamCode')||''}catch(e){}return c})();
 const LOADING='<div class="skel" aria-label="Loading"><i></i><i></i><i></i></div>';
 let sb, user=null, recovering=false, ME=null;
 const money=n=>'$'+Math.round(+n||0).toLocaleString();
@@ -145,6 +149,40 @@ function funnel(calls,meets,sold,paid,comm,commLabel){const rows=[['Cold calls m
 async function fetchAll(table){let out=[];for(let from=0;;from+=1000){const {data,error}=await sb.from(table).select('*').order('id').range(from,from+999);if(error)return{error};out=out.concat(data);if(data.length<1000)break}return{data:out,error:null}}
 function setBadge(){const b=$('#badge');if(!user||!ME){b.hidden=true;return}b.hidden=false;
   b.innerHTML=ME.is_admin?'Admin':ME.role==='manager'?`Manager<i>${+ME.mgr_rate}% of team sales</i>`:ME.rank?`Cold caller<i>${esc(ME.rank.name)} · ${+ME.rank.rate}%</i>`:'Cold caller'}
+const annHTML=l=>l.map(a=>`<div class="annc"><h3><span>Announcement from Joel</span><span>${new Date(a.created_at).toLocaleDateString([],{month:'short',day:'numeric'})}</span></h3><p>${esc(a.body)}</p></div>`).join('');
+async function loadAnn(){const u=user&&user.id,{data,error}=await sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(5);if(!user||user.id!==u||(ME&&ME.is_admin))return;$('#ann').innerHTML=error?'':annHTML(data)}
+let VA=null, ADM=false;
+const vSales=id=>A.leads.filter(l=>l.completed_by===id&&l.meet==='sale'&&in30(l.customer_paid_at)).length;
+const vRank=n=>{let k=A.ranks[0]||{pos:1,name:'',rate:0,min_sales:0};A.ranks.forEach(r=>{if(n>=r.min_sales&&r.min_sales>=k.min_sales)k=r});return k};
+/* While an admin is viewing as someone, the same screens are filled from data the admin already holds. Nothing is sent as that person. */
+async function api(name){
+  if(!VA)return name==='my_leads'?sb.from('leads').select('*').limit(5000):sb.rpc(name);
+  const T=VA.id, L=A.leads, c=A.callers.find(x=>x.id===T)||{}, mine=L.filter(l=>l.completed_by===T), sum=(a,k)=>a.reduce((x,l)=>x+(+l[k]||0),0);
+  const team=A.callers.filter(x=>x.manager_id===T&&x.role!=='manager'), tids=new Set(team.filter(x=>x.status==='accepted').map(x=>x.id));
+  const d={
+    my_leads:()=>L.filter(l=>l.assigned_to===T&&!l.completed_at),
+    my_bookings:()=>mine.filter(l=>l.outcome==='booked').sort((a,b)=>new Date(b.completed_at)-new Date(a.completed_at)),
+    my_summary:()=>{const s=mine.filter(l=>l.meet==='sale'),p=s.filter(l=>l.customer_paid_at);return{calls:mine.filter(l=>in30(l.completed_at)).length,meets:mine.filter(l=>l.outcome==='booked'&&in30(l.completed_at)).length,sold_waiting:s.length-p.length,sales30:vSales(T),earned:sum(p,'comm_amount'),owed:sum(p.filter(l=>!l.comm_paid_at),'comm_amount')}},
+    my_state2:()=>{const n=vSales(T),nx=A.ranks.filter(r=>r.min_sales>n).sort((a,b)=>a.min_sales-b.min_sales)[0]||null;return{is_admin:false,status:'accepted',role:c.role,name:c.full_name,sales30:n,rank:vRank(n),next:nx,mgr_rate:c.role==='manager'?(c.mgr_rate==null?A.mgrRate:+c.mgr_rate):null}},
+    team_members:()=>team.filter(x=>x.status==='accepted').map(x=>{const m=L.filter(l=>l.completed_by===x.id),r=vRank(vSales(x.id));return{id:x.id,full_name:x.full_name,rank_name:r.name,rate:r.rate,held:L.filter(l=>l.assigned_to===x.id&&!l.completed_at).length,calls:m.filter(l=>in30(l.completed_at)).length,meets:m.filter(l=>l.outcome==='booked'&&in30(l.completed_at)).length,sold:m.filter(l=>l.meet==='sale'&&in30(l.meet_at)).length,paid:vSales(x.id)}}).sort((a,b)=>a.full_name.localeCompare(b.full_name)),
+    team_calls:()=>L.filter(l=>tids.has(l.completed_by)&&in30(l.completed_at)).sort((a,b)=>new Date(b.completed_at)-new Date(a.completed_at)).map(l=>({...l,caller_id:l.completed_by,caller:l.completed_by_name})),
+    team_earnings:()=>L.filter(l=>l.mgr_id===T&&l.meet==='sale'&&l.customer_paid_at).sort((a,b)=>new Date(b.customer_paid_at)-new Date(a.customer_paid_at)).map(l=>({...l,caller:l.completed_by_name})),
+    team_applicants:()=>team.filter(x=>x.status==='pending'),
+    my_invite_code:()=>c.invite_code||''}[name];
+  return{data:d?d():null,error:d?null:{message:'Not available in this view'}};
+}
+function fillVas(){const v=$('#vas');v.hidden=!ADM;if(!ADM)return;const ok=A.callers.filter(x=>x.status==='accepted'),opt=(k,x)=>`<option value="${k}:${esc(x.id)}"${VA&&VA.id===x.id?' selected':''}>${esc(x.full_name)}</option>`;
+  v.innerHTML='<option value="">Admin panel</option><optgroup label="Manager view">'+ok.filter(x=>x.role==='manager').map(x=>opt('manager',x)).join('')+'</optgroup><optgroup label="Cold caller view">'+ok.filter(x=>x.role!=='manager').map(x=>opt('caller',x)).join('')+'</optgroup>';
+  v.onchange=()=>viewAs(v.value)}
+async function viewAs(v){
+  if(!v){VA=null;ME={is_admin:true};setBadge();$('#ann').innerHTML='';fillVas();scrollTo(0,0);return showAdmin()}
+  const [kind,id]=v.split(':'),c=A.callers.find(x=>x.id===id);if(!c)return;
+  VA={kind,id};A.live=false;ME=(await api('my_state2')).data;setBadge();fillVas();
+  $('#ann').innerHTML=`<p class="banner"><span><b>Viewing as ${esc(c.full_name)}</b> (${kind==='manager'?'manager':'cold caller'}). This is a read-only look at what they see. Nothing you do here is recorded under their name.</span><button id="vback">Back to admin</button></p>`+annHTML((A.anns||[]).filter(a=>a.audience==='all'||a.audience===(kind==='manager'?'managers':'callers')).slice(0,5));
+  $('#vback').onclick=()=>viewAs('');C.tab='leads';M.tab='team';M.fc=M.fs='';scrollTo(0,0);
+  return kind==='manager'?showManager():showCaller();
+}
+new MutationObserver(()=>{if(VA)view.querySelectorAll('button:not(:disabled)').forEach(b=>{b.disabled=true;b.title='Read-only while viewing as someone else'})}).observe(view,{childList:true,subtree:true});
 function tabsNav(tabs,cur,pick){$('#nav').innerHTML=tabs.map(([k,t])=>`<button id="tab-${k}" data-tab="${k}"${k===cur?' aria-current="page"':''}>${t}</button>`).join('');
   document.querySelectorAll('#nav [data-tab]').forEach(b=>b.onclick=()=>{pick(b.dataset.tab);scrollTo(0,0)})}
 
@@ -171,16 +209,17 @@ const tierRank={hot:0,warm:1,cold:2};
 const byRank=(a,b)=>(tierRank[a.tier]??3)-(tierRank[b.tier]??3)||(b.google_reviews||0)-(a.google_reviews||0)||a.id-b.id;
 
 async function route(){
-  A.live=false; $('#nav').innerHTML=''; if(recovering)return; head();
+  A.live=false; VA=null; ADM=false; $('#vas').hidden=true; $('#nav').innerHTML=''; $('#ann').innerHTML=''; if(recovering)return; head();
   if(!user)return showAuth();
   view.innerHTML=LOADING;
   const {data,error}=await sb.rpc('my_state2');
   if(error){view.innerHTML=`<div class="card"><h2>Could not load</h2><p class="mute">${esc(error.message)}</p></div>`;return}
   ME=data; setBadge();
-  if(data.is_admin)return showAdmin();
+  if(data.is_admin){ADM=true;return showAdmin()}
   if(!data.status)return showApply();
-  if(data.status==='pending')return showInfo('Application received','An admin will review it. Come back to this page after you have been accepted.');
+  if(data.status==='pending')return showInfo('Application received','It is being reviewed. Come back to this page after you have been accepted.');
   if(data.status==='rejected')return showInfo('Application not accepted','Your application was not accepted. Contact the admin if you think this is a mistake.');
+  loadAnn();
   return data.role==='manager'?showManager():showCaller();
 }
 function showInfo(t,b){view.innerHTML=`<div class="card"><h2>${esc(t)}</h2><p class="mute">${esc(b)}</p><button id="again">Check again</button></div>`;$('#again').onclick=route}
@@ -218,15 +257,16 @@ function showNewPassword(){
   $('#f').onsubmit=async e=>{e.preventDefault();const {error}=await sb.auth.updateUser({password:$('#pw').value});
     if(error)return say($('#msg'),error.message,'bad'); recovering=false; route()};
 }
-function showApply(){
-  view.innerHTML=`<div class="card"><h2>Apply as a cold caller</h2><p class="mute small">An admin reviews every application. Once accepted, the leads assigned to you appear here.</p>
+async function showApply(){
+  let team=null; if(teamCode){const r=await sb.rpc('team_name',{p_code:teamCode}); team=r.error?null:r.data}
+  view.innerHTML=`<div class="card"><h2>Apply as a cold caller</h2><p class="mute small">${team?`You are applying to join <b>${esc(team)}</b>'s team. They review your application.`:'An admin reviews every application.'} Once accepted, the leads assigned to you appear here.</p>
   <form id="f"><label for="nm">Full name</label><input id="nm" autocomplete="name" required minlength="2" maxlength="120">
   <label for="ph">Phone (optional)</label><input id="ph" type="tel" autocomplete="tel" maxlength="40">
   <label for="nt">Anything the admin should know (optional)</label><textarea id="nt" maxlength="1000"></textarea>
   <div class="row top"><button class="pri">Send application</button></div><p id="msg"></p></form></div>`;
   $('#f').onsubmit=async e=>{e.preventDefault();
-    const {error}=await sb.rpc('apply_as_caller',{p_name:$('#nm').value,p_phone:$('#ph').value,p_note:$('#nt').value});
-    if(error)return say($('#msg'),error.message,'bad'); route()};
+    const {error}=await sb.rpc('apply_as_caller2',{p_name:$('#nm').value,p_phone:$('#ph').value,p_note:$('#nt').value,p_code:team?teamCode:null});
+    if(error)return say($('#msg'),error.message,'bad'); try{localStorage.removeItem('teamCode')}catch(e){} route()};
 }
 
 const GUIDE=`<details class="guide" id="guide"><summary>Your job, in one minute</summary><div class="gb">
@@ -242,7 +282,7 @@ const GUIDE=`<details class="guide" id="guide"><summary>Your job, in one minute<
 <p class="say">"We've already made a demo website for [business]. Joel can walk you through it on a quick Google Meet. Would [day] at [time] work?"</p>
 <p class="warn">Only say a demo website has already been made when Joel has confirmed one exists for that business. If you are not sure, use the first version.</p>
 <h3>After the call</h3>
-<p><b>They said yes:</b> press Check off, then "Booked a call", and fill in their name, email and the Meet day and time. Joel sees it straight away, and the booking stays yours.</p>
+<p><b>They said yes:</b> press Check off, then "Booked a call". Pick a free time on Joel's calendar with the owner still on the phone, then fill in their name, email and that day and time here. The booking stays yours.</p>
 <p><b>Nobody picked up:</b> press Check off, then "No answer". It stays on your list to try again.</p>
 <p><b>They said no:</b> thank them, then press Check off and "No booking".</p></div></details>`;
 function wireGuide(){const g=document.getElementById('guide');if(!g)return;let shut=false;try{shut=localStorage.getItem('guideShut')==='1'}catch(e){}g.open=!shut;g.ontoggle=()=>{try{localStorage.setItem('guideShut',g.open?'0':'1')}catch(e){}}}
@@ -252,13 +292,13 @@ function showCaller(){
   return C.tab==='leads'?showMyLeads():C.tab==='book'?showBookings():C.tab==='rank'?showRank():showEarnings();
 }
 async function showBookings(){
-  view.innerHTML=LOADING; const {data,error}=await sb.rpc('my_bookings'); if(C.tab!=='book')return; if(error)return fail(error);
+  view.innerHTML=LOADING; const {data,error}=await api('my_bookings'); if(C.tab!=='book')return; if(error)return fail(error);
   view.innerHTML=`<div class="pagehead"><h2>My bookings</h2><span class="stat">${data.length} booked</span></div><p class="mute small">Every Meet you booked stays yours. If Joel closes it and the customer pays, the commission is yours.</p>`+
   (data.length?tbl(['Business','Booked','Meet','Where it stands','#Your commission'],data.map(l=>`<tr><td><div class="nm">${esc(l.business_name)}</div><div class="reg">${esc(l.city)}, ${esc(l.region)}</div></td><td>${when(l.completed_at)}</td><td>${when(l.bk_when)||'–'}</td><td>${chip({...l,outcome:'booked'})}</td><td class="num">${l.meet==='sale'?money(l.comm_amount)+(l.customer_paid_at?(l.comm_paid_at?' · paid':' · owed'):' · pending'):'–'}</td></tr>`))
    :emptyBox('No bookings yet. When you book a Meet it shows here with where it stands.'));
 }
 async function showRank(){
-  view.innerHTML=LOADING; const [s,r,m]=await Promise.all([sb.rpc('my_state2'),sb.from('ranks').select('*').order('pos'),sb.rpc('my_summary')]);
+  view.innerHTML=LOADING; const [s,r,m]=await Promise.all([api('my_state2'),sb.from('ranks').select('*').order('pos'),api('my_summary')]);
   if(C.tab!=='rank')return; const e=s.error||r.error||m.error; if(e)return fail(e); ME=s.data; setBadge(); const nx=ME.next,x=m.data;
   view.innerHTML=`<div class="pagehead"><h2>Your rank</h2><span class="stat">last 30 days</span></div>
   <div class="rank"><div class="box"><h3>Rank</h3><p class="big">${esc(ME.rank.name)}</p><p class="rate">${+ME.rank.rate}% commission on every sale Joel closes from your bookings</p>
@@ -267,14 +307,15 @@ async function showRank(){
   <div class="pagehead"><h2>All ranks</h2></div><div class="wrap"><ol class="steps">${r.data.map((k,i)=>`<li class="${k.pos===ME.rank.pos?'here':''}"><span class="n">${i+1}</span><span class="nm2">${esc(k.name)}</span><span class="r">${+k.rate}%</span><small>${k.min_sales?k.min_sales+' sales in the last 30 days':'Where everyone starts'}</small></li>`).join('')}</ol></div>`;
 }
 async function showEarnings(){
-  view.innerHTML=LOADING; const [m,b]=await Promise.all([sb.rpc('my_summary'),sb.rpc('my_bookings')]); if(C.tab!=='earn')return; const e=m.error||b.error; if(e)return fail(e);
+  view.innerHTML=LOADING; const [m,b]=await Promise.all([api('my_summary'),api('my_bookings')]); if(C.tab!=='earn')return; const e=m.error||b.error; if(e)return fail(e);
   const x=m.data, L=b.data.filter(l=>l.meet==='sale'&&l.customer_paid_at);
   view.innerHTML=`<div class="pagehead"><h2>Earnings</h2></div><dl class="sum s3"><div><dt>Sales paid, last 30 days</dt><dd>${x.sales30}</dd></div><div><dt>Commission earned</dt><dd>${money(x.earned)}</dd></div><div><dt>Still owed to you</dt><dd>${money(x.owed)}</dd></div></dl>`+
   (L.length?tbl(['Business','Customer paid','#Sale','#Your rate','#Commission','Status'],L.map(l=>`<tr><td class="nm">${esc(l.business_name)}</td><td>${when(l.customer_paid_at)}</td><td class="num">${money(l.sale_amount)}</td><td class="num">${+l.comm_rate}%</td><td class="num">${money(l.comm_amount)}</td><td><span class="tier plain ${l.comm_paid_at?'ok':'no'}">${l.comm_paid_at?'Paid':'Owed'}</span></td></tr>`))
    :emptyBox('No commission yet. It appears here when Joel closes one of your bookings and the customer pays.'));
 }
 async function showMyLeads(){
-  const {data,error}=await sb.from('leads').select('*').limit(5000); if(C.tab!=='leads')return;
+  const [{data,error},bl]=await Promise.all([api('my_leads'),sb.rpc('booking_link')]); if(C.tab!=='leads')return;
+  const cal=!bl.error&&/^https:\/\/(calendar\.app\.google|calendar\.google\.com)\//.test(bl.data||'')?bl.data:'';
   if(error){view.innerHTML=`<p class="note bad">${esc(error.message)}</p>`;return}
   const rows=(data||[]).sort(byRank);
   if(!rows.length){view.innerHTML=GUIDE+'<div class="pagehead"><h2>Your leads</h2></div><div class="wrap"><div class="empty">You have no leads to call right now. New ones appear here when the admin assigns them.</div></div><div class="row top"><button id="again">Check again</button></div>';$('#again').onclick=showMyLeads;wireGuide();return}
@@ -289,7 +330,7 @@ async function showMyLeads(){
     const b=e.target.closest('button'); if(!b)return; const tr=b.closest('tr'), cell=b.closest('td'), id=+tr.dataset.id, biz=tr.children[1].textContent.trim();
     if('done' in b.dataset){cell.innerHTML='<button class="pri" data-book>Booked a call</button> <button data-res="no_answer">No answer</button> <button data-res="not_booked">No booking</button> <button class="link" data-cancel>Cancel</button>';return}
     if('cancel' in b.dataset){cell.innerHTML=offBtn(tries[id]);return}
-    if('book' in b.dataset){cell.innerHTML='<div class="bkf"><input class="bn" maxlength="120" placeholder="Owner\'s name" aria-label="Owner\'s name"><input class="be" type="email" maxlength="200" placeholder="Their email, for the Meet invite" aria-label="Their email"><input class="bw" type="datetime-local" aria-label="Meet day and time"><button class="pri" data-res="booked">Save booking</button><button class="link" data-cancel>Cancel</button></div>';cell.querySelector('.bn').focus();return}
+    if('book' in b.dataset){cell.innerHTML='<div class="bkf">'+(cal?`<a class="calbtn" href="${esc(cal)}" target="_blank" rel="noopener">1. Pick a time on Joel's calendar</a><span class="reg">Book it there with the owner's name and email, so Google sends them the Meet invite. Then fill in the same details here.</span>`:'')+'<input class="bn" maxlength="120" placeholder="Owner\'s name" aria-label="Owner\'s name"><input class="be" type="email" maxlength="200" placeholder="Their email, for the Meet invite" aria-label="Their email"><input class="bw" type="datetime-local" aria-label="Meet day and time"><button class="pri" data-res="booked">Save booking</button><button class="link" data-cancel>Cancel</button></div>';cell.querySelector('.bn').focus();return}
     if(!('res' in b.dataset))return; const res=b.dataset.res, args={p_lead:id,p_outcome:res};
     if(res==='booked'){const n=cell.querySelector('.bn').value.trim(),w=cell.querySelector('.bw').value;
       if(!n||!w)return say($('#msg'),"Add the owner's name and the Meet day and time first.",'bad');
@@ -312,13 +353,23 @@ function showManager(){
   return M.tab==='team'?mTeam():M.tab==='earn'?mEarn():mCalls();
 }
 async function mTeam(){
-  view.innerHTML=LOADING; const {data,error}=await sb.rpc('team_members'); if(M.tab!=='team')return; if(error)return fail(error);
-  view.innerHTML=`<div class="pagehead"><h2>My team</h2><span class="stat">${data.length} caller${data.length===1?'':'s'} · last 30 days</span></div><p class="mute small">Callers Joel has put on your team. You see how they are doing; Joel assigns leads and closes sales.</p>`+
+  view.innerHTML=LOADING; const [tm,ap,ic]=await Promise.all([api('team_members'),api('team_applicants'),api('my_invite_code')]); if(M.tab!=='team')return;
+  const error=tm.error||ap.error||ic.error; if(error)return fail(error); const data=tm.data, link=ic.data?here+'?team='+encodeURIComponent(ic.data):'Created the first time they open this page';
+  view.innerHTML=`<p class="note ${M.note?M.note[1]:''}" id="note" role="status">${esc(M.note?M.note[0]:'')}</p>
+  <section class="sec"><div class="pagehead"><h2>Your invite link</h2></div><p class="mute small">Send this to people you want on your team. Anyone who applies through it is attached to you, and you accept them below.</p>
+  <div class="bar"><input id="ilink" readonly value="${esc(link)}" aria-label="Your invite link" style="flex:1;min-width:220px;max-width:520px"><button class="pri" id="icopy">Copy link</button></div></section>
+  <section class="sec"><div class="pagehead"><h2>Applications to your team</h2><span class="stat">${ap.data.length} waiting</span></div>`+
+  (ap.data.length?`<div class="wrap attn"><table class="stack"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Note</th><th>Applied</th><th></th></tr></thead><tbody>${ap.data.map(c=>`<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td><td class="act end"><button class="pri" data-dec="1" data-id="${esc(c.id)}">Accept</button> <button data-dec="0" data-id="${esc(c.id)}">Reject</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="mute">No one is waiting. New applicants from your link appear here.</p>')+`</section>
+  <section class="sec"><div class="pagehead"><h2>My team</h2><span class="stat">${data.length} caller${data.length===1?'':'s'} · last 30 days</span></div><p class="mute small">Everyone accepted onto your team. You see how they are doing; Joel assigns leads and closes sales.</p>`+
   (data.length?tbl(['Caller','Rank','#Leads held','#Calls','#Booked with Joel','#Sales closed','#Customer paid'],data.map(c=>`<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.rank_name)} · ${+c.rate}%</td><td class="num">${c.held}</td><td class="num">${c.calls}</td><td class="num">${c.meets}</td><td class="num">${c.sold}</td><td class="num held">${c.paid}</td></tr>`))
-   :emptyBox('No callers on your team yet. Joel adds callers to your team from the admin panel.'));
+   :emptyBox('No callers on your team yet. Share your invite link, or Joel can add callers to your team.'))+'</section>';
+  M.note=null;
+  $('#icopy').onclick=async()=>{const i=$('#ilink');i.select();try{await navigator.clipboard.writeText(i.value);say($('#note'),'Link copied.','ok')}catch(e){say($('#note'),'Select the link and copy it.','bad')}};
+  view.querySelectorAll('[data-dec]').forEach(b=>b.onclick=async()=>{b.closest('td').querySelectorAll('button').forEach(x=>x.disabled=true);const yes=b.dataset.dec==='1';
+    const {error}=await sb.rpc('team_decide',{p_caller:b.dataset.id,p_accept:yes});M.note=error?[error.message,'bad']:[yes?'Accepted. They are on your team; Joel assigns their leads.':'Rejected.','ok'];mTeam()});
 }
 async function mCalls(){
-  view.innerHTML=LOADING; const t=M.tab, {data,error}=await sb.rpc('team_calls'); if(M.tab!==t)return; if(error)return fail(error);
+  view.innerHTML=LOADING; const t=M.tab, {data,error}=await api('team_calls'); if(M.tab!==t)return; if(error)return fail(error);
   const n={calls:data.length,meets:data.filter(l=>l.outcome==='booked').length,sold:data.filter(l=>l.meet==='sale').length,paid:data.filter(l=>l.meet==='sale'&&l.customer_paid_at).length};
   if(t==='funnel'){view.innerHTML=`<div class="pagehead"><h2>Team funnel</h2><span class="stat">last 30 days</span></div>`+funnel(n.calls,n.meets,n.sold,n.paid,data.filter(l=>l.customer_paid_at).reduce((a,l)=>a+(+l.sale_amount||0),0),'Sales value paid by customers');return}
   const who=[...new Map(data.map(l=>[l.caller_id,l.caller])).entries()];
@@ -333,7 +384,7 @@ async function mCalls(){
   draw();
 }
 async function mEarn(){
-  view.innerHTML=LOADING; const {data,error}=await sb.rpc('team_earnings'); if(M.tab!=='earn')return; if(error)return fail(error);
+  view.innerHTML=LOADING; const {data,error}=await api('team_earnings'); if(M.tab!=='earn')return; if(error)return fail(error);
   const sum=k=>data.reduce((a,l)=>a+(+l[k]||0),0), owed=data.filter(l=>!l.mgr_paid_at).reduce((a,l)=>a+(+l.mgr_amount||0),0);
   view.innerHTML=`<div class="pagehead"><h2>Earnings</h2></div><p class="mute small">You earn ${+ME.mgr_rate}% of every sale your team's bookings close, once the customer has paid. It comes on top of the caller's commission, not out of it.</p>
   <dl class="sum s3"><div><dt>Team sales paid</dt><dd>${data.length}</dd></div><div><dt>Your earnings</dt><dd>${money(sum('mgr_amount'))}</dd></div><div><dt>Still owed to you</dt><dd>${money(owed)}</dd></div></dl>`+
@@ -344,21 +395,21 @@ async function mEarn(){
 /* ---------- admin ---------- */
 let A={tab:'people',callers:[],leads:[],ranks:[],invites:[],mgrRate:5,note:['',''],live:false,busy:false,dirty:false,rejOpen:false};
 async function loadAdmin(){
-  const [c,l,r,i,p]=await Promise.all([sb.from('callers').select('*').order('applied_at',{ascending:false}),fetchAll('leads'),sb.from('ranks').select('*').order('pos'),sb.from('invites').select('*').order('created_at'),sb.from('pay_settings').select('*')]);
-  const error=c.error||l.error||r.error||i.error||p.error; if(error)return{error};
-  return{callers:c.data,leads:l.data.sort(byRank),ranks:r.data,invites:i.data,mgrRate:p.data[0]?+p.data[0].mgr_rate:5};
+  const [c,l,r,i,p,an]=await Promise.all([sb.from('callers').select('*').order('applied_at',{ascending:false}),fetchAll('leads'),sb.from('ranks').select('*').order('pos'),sb.from('invites').select('*').order('created_at'),sb.from('pay_settings').select('*'),sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(50)]);
+  const error=c.error||l.error||r.error||i.error||p.error||an.error; if(error)return{error};
+  return{callers:c.data,leads:l.data.sort(byRank),ranks:r.data,invites:i.data,mgrRate:p.data[0]?+p.data[0].mgr_rate:5,bookUrl:(p.data[0]&&p.data[0].booking_url)||'',anns:an.data};
 }
-const putAdmin=d=>{A.callers=d.callers;A.leads=d.leads;A.ranks=d.ranks;A.invites=d.invites;A.mgrRate=d.mgrRate};
+const putAdmin=d=>{A.callers=d.callers;A.leads=d.leads;A.ranks=d.ranks;A.invites=d.invites;A.mgrRate=d.mgrRate;A.bookUrl=d.bookUrl;A.anns=d.anns};
 async function showAdmin(){
   view.innerHTML=LOADING;
   const d=await loadAdmin(); if(d.error)return fail(d.error);
-  putAdmin(d); A.live=true; A.dirty=false; drawAdmin();
+  putAdmin(d); if(VA)return; A.live=true; A.dirty=false; fillVas(); drawAdmin();
 }
 /* Live updates: every few seconds the admin panel re-reads the data and redraws only if something changed,
    keeping filters, typed numbers, ticked leads and scroll position. */
-const sig=()=>JSON.stringify([A.callers.map(c=>[c.id,c.status,c.full_name,c.role,c.manager_id,c.mgr_rate]),A.leads.map(l=>[l.id,l.assigned_to,l.completed_at,l.outcome,l.meet,l.sale_amount,l.customer_paid_at,l.comm_paid_at,l.mgr_paid_at]),A.ranks,A.invites,A.mgrRate]);
+const sig=()=>JSON.stringify([A.callers.map(c=>[c.id,c.status,c.full_name,c.role,c.manager_id,c.mgr_rate]),A.leads.map(l=>[l.id,l.assigned_to,l.completed_at,l.outcome,l.meet,l.sale_amount,l.customer_paid_at,l.comm_paid_at,l.mgr_paid_at]),A.ranks,A.invites,A.mgrRate,A.bookUrl,A.anns]);
 async function poll(){
-  if(!A.live||A.busy||document.hidden||!user)return;
+  if(!A.live||A.busy||document.hidden||!user||VA)return;
   const d=await loadAdmin();
   if(d.error||!A.live||A.busy)return;
   const before=sig(); putAdmin(d);
@@ -409,10 +460,18 @@ function drawAdmin(){
   <button id="tab-meets" data-tab="meets"${cur('meets')}>Meets and sales${waiting.length?`<span class="badge new">${waiting.length}</span>`:''}</button>
   <button id="tab-done" data-tab="done"${cur('done')}>Completed<span class="badge">${done.length}</span></button>
   <button id="tab-rules" data-tab="rules"${cur('rules')}>Pay rules</button>
-  <button id="tab-pay" data-tab="pay"${cur('pay')}>Payouts</button>`;
+  <button id="tab-pay" data-tab="pay"${cur('pay')}>Payouts</button>
+  <button id="tab-ann" data-tab="ann"${cur('ann')}>Announcements${(A.anns||[]).length?`<span class="badge">${A.anns.length}</span>`:''}</button>`;
   let h=`<dl class="sum"><div><dt>Leads</dt><dd>${A.leads.length}</dd></div><div><dt>Unassigned</dt><dd>${free}</dd></div><div><dt>With callers</dt><dd>${open.length-free}</dd></div><div><dt>Completed</dt><dd>${done.length}</dd></div></dl>
   <p class="note ${A.note[1]}" id="note" role="status">${esc(A.note[0])}</p>`;
-  if(A.tab==='over'){
+  if(A.tab==='ann'){
+    const aud={all:'Everyone',callers:'Cold callers only',managers:'Managers only'};
+    h+=`<div class="pagehead"><h2>New announcement</h2></div><p class="mute small">Shown at the top of the page for everyone you choose, until you remove it. Nothing is emailed or texted.</p>
+    <div class="card" style="margin:0 0 32px;max-width:640px"><label for="annb" style="margin-top:0">Announcement</label><textarea id="annb" maxlength="2000" placeholder="What do you want everyone to know?"></textarea>
+    <label for="anna">Who sees it</label><select id="anna"><option value="all">Everyone</option><option value="callers">Cold callers only</option><option value="managers">Managers only</option></select>
+    <div class="row top"><button class="pri" id="annpost">Post announcement</button></div></div>
+    <div class="pagehead"><h2>Showing now</h2><span class="stat">${A.anns.length}</span></div>`+(A.anns.length?A.anns.map(a=>`<div class="annc"><h3><span>${aud[a.audience]||''} · ${when(a.created_at)}</span><button class="link" data-unann="${a.id}">Remove</button></h3><p>${esc(a.body)}</p></div>`).join(''):'<p class="mute">No announcements are showing.</p>');
+  }else if(A.tab==='over'){
     const d30=done.filter(l=>in30(l.completed_at)), c=d30.length, m=d30.filter(l=>l.outcome==='booked').length, so=d30.filter(l=>l.meet==='sale').length, pa=d30.filter(l=>l.meet==='sale'&&l.customer_paid_at).length;
     const per=accepted.map(x=>{const L=d30.filter(l=>l.completed_by===x.id);return{x,calls:L.length,meets:L.filter(l=>l.outcome==='booked').length,paid:s30[x.id]||0}}).sort((a,b)=>b.paid-a.paid||b.meets-a.meets||b.calls-a.calls);
     h+=`<div class="pagehead"><h2>The funnel</h2><span class="stat">last 30 days</span></div>`+funnel(c,m,so,pa,paidSales.filter(l=>in30(l.customer_paid_at)).reduce((a,l)=>a+(+l.comm_amount||0),0),'Commission earned by callers')+
@@ -433,7 +492,9 @@ function drawAdmin(){
   }else if(A.tab==='rules'){
     h+=`<div class="pagehead"><h2>Pay rules</h2></div><p class="mute small">Ranks count sales paid by the customer in the last 30 days. A caller's commission rate is fixed on the day you mark each sale.</p>`+
     tbl(['Rank name','#Sales in 30 days','#Commission rate %'],A.ranks.map(r=>`<tr><td><input id="rn${r.pos}" value="${esc(r.name)}" maxlength="40" aria-label="Rank name"></td><td class="num"><input id="rs${r.pos}" type="number" min="0" value="${r.min_sales}" aria-label="Sales needed" ${r.pos===1?'disabled':''}></td><td class="num"><input id="rr${r.pos}" type="number" min="0" max="100" step="0.5" value="${+r.rate}" aria-label="Commission rate"></td></tr>`))+
-    `<div class="box" style="margin-top:16px;max-width:520px"><h3>Manager cut, default</h3><label for="ov" style="margin-top:0">Percent of each team sale paid to a manager, unless you set their own rate on the People tab</label><input id="ov" type="number" min="0" max="100" step="0.5" value="${A.mgrRate}"></div><div class="row top"><button class="pri" id="saverules">Save pay rules</button></div>`;
+    `<div class="box" style="margin-top:16px;max-width:520px"><h3>Manager cut, default</h3><label for="ov" style="margin-top:0">Percent of each team sale paid to a manager, unless you set their own rate on the People tab</label><input id="ov" type="number" min="0" max="100" step="0.5" value="${A.mgrRate}"></div><div class="row top"><button class="pri" id="saverules">Save pay rules</button></div>
+    <div class="pagehead" style="margin-top:32px"><h2>Google Calendar booking link</h2><span class="stat">${A.bookUrl?'set':'not set'}</span></div><p class="mute small">Paste the link to your Google Calendar booking page. Callers get a button to it when they mark a lead as booked, so they can pick one of your free times. They only ever see that booking page, never your calendar.</p>
+    <div class="bar"><input id="burl" type="url" maxlength="500" placeholder="https://calendar.app.google/..." value="${esc(A.bookUrl||'')}" aria-label="Booking page link" style="flex:1;min-width:240px;max-width:520px"><button class="pri" id="saveburl">Save link</button></div>`;
   }else if(A.tab==='pay'){
     const rows=[...accepted.map(c=>{const L=paidSales.filter(l=>l.completed_by===c.id);return[c,'Cold caller','caller',L.reduce((a,l)=>a+(+l.comm_amount||0),0),L.filter(l=>!l.comm_paid_at).reduce((a,l)=>a+(+l.comm_amount||0),0)]}),
       ...managers.map(c=>{const L=paidSales.filter(l=>l.mgr_id===c.id);return[c,'Manager','manager',L.reduce((a,l)=>a+(+l.mgr_amount||0),0),L.filter(l=>!l.mgr_paid_at).reduce((a,l)=>a+(+l.mgr_amount||0),0)]})];
@@ -444,7 +505,7 @@ function drawAdmin(){
       <p class="mute small">They skip the application and get this role the first time they sign in with that email. No email is sent, so tell them to create an account with that address.</p>`+
       (A.invites.length?tbl(['Waiting to sign in','Role',''],A.invites.map(i=>`<tr><td>${esc(i.email)}</td><td>${i.role==='manager'?'Manager':'Cold caller'}</td><td class="act end"><button data-uninvite="${esc(i.email)}">Remove</button></td></tr>`)):'')+'</section>';
     h+=`<section class="sec"><div class="pagehead"><h2>Applications</h2></div>`+(pending.length?`<div class="wrap attn"><table class="stack"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Note</th><th>Applied</th><th></th></tr></thead><tbody>${pending.map(c=>
-      `<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td>
+      `<tr><td><div class="nm">${esc(c.full_name)}</div>${c.manager_id?`<div class="reg">via ${esc(nameOf[c.manager_id]||'a manager')}'s link</div>`:''}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td>
       <td class="act end"><button class="pri" data-status="accepted" data-id="${esc(c.id)}">Accept</button> <button data-status="rejected" data-id="${esc(c.id)}">Reject</button></td></tr>`).join('')}</tbody></table></div>`
       :'<p class="mute">No applications waiting.</p>')+'</section>';
     h+=`<section class="sec"><div class="pagehead"><h2>Callers</h2><span class="stat">${accepted.length} accepted</span></div>`+(accepted.length?`<p class="mute small">"Assign" gives that caller the next unassigned leads, best first. A lead only ever belongs to one caller.</p>
@@ -501,6 +562,10 @@ function drawAdmin(){
   view.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>{b.disabled=true;act(sb.rpc('admin_mark_paid',{p_person:b.dataset.pay,p_kind:b.dataset.kind}),d=>`Marked ${d} sale${d===1?'':'s'} as paid out.`)});
   const ap=document.getElementById('addp'); if(ap)ap.onclick=()=>{const e=$('#ne').value.trim(),r=$('#nr').value;if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){A.note=['Enter a full email address.','bad'];return say($('#note'),...A.note)}
     ap.disabled=true;act(sb.rpc('admin_add_email',{p_email:e,p_role:r}),d=>d==='updated'?`${e} already has an account, so they are now an accepted ${r==='manager'?'manager':'cold caller'}.`:`Added ${e}. They become a ${r==='manager'?'manager':'cold caller'} the first time they sign in with that email. No email was sent.`).then(()=>{const x=document.getElementById('ne');if(x)x.value=''})};
+  const sb2=document.getElementById('saveburl'); if(sb2)sb2.onclick=()=>{sb2.disabled=true;act(sb.rpc('admin_set_booking_url',{p_url:$('#burl').value.trim()}),$('#burl').value.trim()?'Booking link saved. Callers see it the next time they book.':'Booking link removed.')};
+  const apb=document.getElementById('annpost'); if(apb)apb.onclick=()=>{const t=$('#annb').value.trim();if(!t){A.note=['Write the announcement first.','bad'];return say($('#note'),...A.note)}
+    apb.disabled=true;act(sb.rpc('admin_post_announcement',{p_body:t,p_audience:$('#anna').value}),'Posted. It now shows at the top of their page.').then(()=>{const x=document.getElementById('annb');if(x)x.value=''})};
+  view.querySelectorAll('[data-unann]').forEach(b=>b.onclick=()=>{b.disabled=true;act(sb.rpc('admin_remove_announcement',{p_id:+b.dataset.unann}),'Removed. Nobody sees it any more.')});
   const sr=document.getElementById('saverules'); if(sr)sr.onclick=()=>{const ranks=A.ranks.map(r=>({pos:r.pos,name:$('#rn'+r.pos).value.trim(),min_sales:parseInt($('#rs'+r.pos).value,10)||0,rate:parseFloat($('#rr'+r.pos).value)||0}));
     sr.disabled=true;act(sb.rpc('admin_save_pay_rules',{p_ranks:ranks,p_mgr_rate:parseFloat($('#ov').value)||0}),'Pay rules saved. Ranks update straight away; rates already fixed on past sales do not change.')};
   if(A.tab==='done'&&done.length){
