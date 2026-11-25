@@ -121,6 +121,7 @@ td select{height:32px;font-size:13px;width:auto;max-width:180px}td input[type=nu
 .stack td.act{flex-basis:100%;white-space:normal}.stack td.end{display:flex;gap:8px}.stack td.act button{height:40px}.stack td.end button{flex:1}.stack .grp input{flex:1;height:40px}.stack .grp button{flex:1}
 #top .in{flex-wrap:wrap}.rank{grid-template-columns:1fr}.sum.s3{grid-template-columns:1fr}.sum.s3 div{border-left:0;border-top:1px solid var(--line)}.sum.s3 div:first-child{border-top:0}.acct{gap:8px}#who{display:none}.rolebadge i{display:none}.mine td.act .bkf{width:100%}.mine td.act .bkf button{flex:none}
 #nav{scrollbar-width:none}#nav::-webkit-scrollbar{display:none}.bar.sel select{flex:1 1 100%}.bar.sel #give,.bar.sel #take{flex:1;height:40px}}
+#top.two .in{flex-wrap:wrap}#top.two #nav{order:3;flex:1 1 100%;overflow-x:auto;scrollbar-width:none}#top.two #nav::-webkit-scrollbar{display:none}#top.two #nav button{min-height:44px}@media(max-width:560px){#top.two #vas{max-width:110px!important}}#top.two #tab-leads{margin-left:8px;padding-left:20px;border-left:1px solid var(--line)}
 </style></head><body><header id="top"><div class="in"><h1>Leads</h1><nav id="nav" aria-label="Sections"></nav><div class="acct"><select id="vas" aria-label="View as" hidden style="width:auto;height:30px;font-size:13px;max-width:190px"></select><span id="who"></span><span id="badge" class="rolebadge" hidden></span><button id="out" hidden>Sign out</button></div></div></header>
 <main>
 <div id="ann"></div>
@@ -149,7 +150,7 @@ function funnel(calls,meets,sold,paid,comm,commLabel){const rows=[['Cold calls m
   <div class="fr"><div class="l"><span><b>${commLabel}</b> <span class="mute small">due once the customer has paid</span></span><span>${money(comm)}</span></div></div></div>`}
 async function fetchAll(table){let out=[];for(let from=0;;from+=1000){const {data,error}=await sb.from(table).select('*').order('id').range(from,from+999);if(error)return{error};out=out.concat(data);if(data.length<1000)break}return{data:out,error:null}}
 function setBadge(){const b=$('#badge');if(!user||!ME){b.hidden=true;return}b.hidden=false;
-  b.innerHTML=ME.is_admin?'Admin':ME.role==='manager'?`Manager<i>${+ME.mgr_rate}% of team sales</i>`:ME.rank?`Cold caller<i>${esc(ME.rank.name)} · ${+ME.rank.rate}%</i>`:'Cold caller'}
+  b.innerHTML=ME.is_admin?'Admin':ME.role==='manager'?(ME.also_caller?`Manager + caller<i>${+ME.mgr_rate}% of team sales${ME.rank?` · ${+ME.rank.rate}% of your own`:''}</i>`:`Manager<i>${+ME.mgr_rate}% of team sales</i>`):ME.rank?`Cold caller<i>${esc(ME.rank.name)} · ${+ME.rank.rate}%</i>`:'Cold caller'}
 const annHTML=l=>l.map(a=>`<div class="annc"><h3><span>Announcement from Joel</span><span>${new Date(a.created_at).toLocaleDateString([],{month:'short',day:'numeric'})}</span></h3><p>${esc(a.body)}</p></div>`).join('');
 async function loadAnn(){const u=user&&user.id,{data,error}=await sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(5);if(!user||user.id!==u||(ME&&ME.is_admin))return;$('#ann').innerHTML=error?'':annHTML(data)}
 let VA=null, ADM=false;
@@ -164,7 +165,7 @@ async function api(name){
     my_leads:()=>L.filter(l=>l.assigned_to===T&&!l.completed_at),
     my_bookings:()=>mine.filter(l=>l.outcome==='booked').sort((a,b)=>new Date(b.completed_at)-new Date(a.completed_at)),
     my_summary:()=>{const s=mine.filter(l=>l.meet==='sale'),p=s.filter(l=>l.customer_paid_at);return{calls:mine.filter(l=>in30(l.completed_at)).length,meets:mine.filter(l=>l.outcome==='booked'&&in30(l.completed_at)).length,sold_waiting:s.length-p.length,sales30:vSales(T),earned:sum(p,'comm_amount'),owed:sum(p.filter(l=>!l.comm_paid_at),'comm_amount')}},
-    my_state2:()=>{const n=vSales(T),nx=A.ranks.filter(r=>r.min_sales>n).sort((a,b)=>a.min_sales-b.min_sales)[0]||null;return{is_admin:false,status:'accepted',role:c.role,name:c.full_name,sales30:n,rank:vRank(n),next:nx,mgr_rate:c.role==='manager'?(c.mgr_rate==null?A.mgrRate:+c.mgr_rate):null}},
+    my_state2:()=>{const n=vSales(T),nx=A.ranks.filter(r=>r.min_sales>n).sort((a,b)=>a.min_sales-b.min_sales)[0]||null;return{is_admin:false,status:'accepted',role:c.role,also_caller:c.role==='manager'&&!!c.also_caller,name:c.full_name,sales30:n,rank:vRank(n),next:nx,mgr_rate:c.role==='manager'?(c.mgr_rate==null?A.mgrRate:+c.mgr_rate):null}},
     team_members:()=>team.filter(x=>x.status==='accepted').map(x=>{const m=L.filter(l=>l.completed_by===x.id),r=vRank(vSales(x.id));return{id:x.id,full_name:x.full_name,rank_name:r.name,rate:r.rate,held:L.filter(l=>l.assigned_to===x.id&&!l.completed_at).length,calls:m.filter(l=>in30(l.completed_at)).length,meets:m.filter(l=>l.outcome==='booked'&&in30(l.completed_at)).length,sold:m.filter(l=>l.meet==='sale'&&in30(l.meet_at)).length,paid:vSales(x.id)}}).sort((a,b)=>a.full_name.localeCompare(b.full_name)),
     team_calls:()=>L.filter(l=>tids.has(l.completed_by)&&in30(l.completed_at)).sort((a,b)=>new Date(b.completed_at)-new Date(a.completed_at)).map(l=>({...l,caller_id:l.completed_by,caller:l.completed_by_name})),
     team_earnings:()=>L.filter(l=>l.mgr_id===T&&l.meet==='sale'&&l.customer_paid_at).sort((a,b)=>new Date(b.customer_paid_at)-new Date(a.customer_paid_at)).map(l=>({...l,caller:l.completed_by_name})),
@@ -173,18 +174,18 @@ async function api(name){
   return{data:d?d():null,error:d?null:{message:'Not available in this view'}};
 }
 function fillVas(){const v=$('#vas');v.hidden=!ADM;if(!ADM)return;const ok=A.callers.filter(x=>x.status==='accepted'),opt=(k,x)=>`<option value="${k}:${esc(x.id)}"${VA&&VA.id===x.id?' selected':''}>${esc(x.full_name)}</option>`;
-  v.innerHTML='<option value="">Admin panel</option><optgroup label="Manager view">'+ok.filter(x=>x.role==='manager').map(x=>opt('manager',x)).join('')+'</optgroup><optgroup label="Cold caller view">'+ok.filter(x=>x.role!=='manager').map(x=>opt('caller',x)).join('')+'</optgroup>';
+  v.innerHTML='<option value="">Admin panel</option><optgroup label="Manager view">'+ok.filter(x=>x.role==='manager').map(x=>opt('manager',x).replace('</option>',x.also_caller?' (also cold caller)</option>':'</option>')).join('')+'</optgroup><optgroup label="Cold caller view">'+ok.filter(x=>x.role!=='manager').map(x=>opt('caller',x)).join('')+'</optgroup>';
   v.onchange=()=>viewAs(v.value)}
 async function viewAs(v){
   if(!v){VA=null;ME={is_admin:true};setBadge();$('#ann').innerHTML='';fillVas();scrollTo(0,0);return showAdmin()}
   const [kind,id]=v.split(':'),c=A.callers.find(x=>x.id===id);if(!c)return;
   VA={kind,id};A.live=false;ME=(await api('my_state2')).data;setBadge();fillVas();
-  $('#ann').innerHTML=`<p class="banner"><span><b>Viewing as ${esc(c.full_name)}</b> (${kind==='manager'?'manager':'cold caller'}). This is a read-only look at what they see. Nothing you do here is recorded under their name.</span><button id="vback">Back to admin</button></p>`+annHTML((A.anns||[]).filter(a=>a.audience==='all'||a.audience===(kind==='manager'?'managers':'callers')).slice(0,5));
-  $('#vback').onclick=()=>viewAs('');C.tab='leads';M.tab='team';M.fc=M.fs='';scrollTo(0,0);
+  $('#ann').innerHTML=`<p class="banner"><span><b>Viewing as ${esc(c.full_name)}</b> (${kind==='manager'?(c.also_caller?'manager and cold caller':'manager'):'cold caller'}). This is a read-only look at what they see. Nothing you do here is recorded under their name.</span><button id="vback">Back to admin</button></p>`+annHTML((A.anns||[]).filter(a=>a.audience==='all'||a.audience===(kind==='manager'?'managers':'callers')||(kind==='manager'&&c.also_caller&&a.audience==='callers')).slice(0,5));
+  $('#vback').onclick=()=>viewAs('');C.tab='leads';M.tab='team';D='team';M.fc=M.fs='';scrollTo(0,0);
   return kind==='manager'?showManager():showCaller();
 }
 new MutationObserver(()=>{if(VA)view.querySelectorAll('button:not(:disabled)').forEach(b=>{b.disabled=true;b.title='Read-only while viewing as someone else'})}).observe(view,{childList:true,subtree:true});
-function tabsNav(tabs,cur,pick){$('#nav').innerHTML=tabs.map(([k,t])=>`<button id="tab-${k}" data-tab="${k}"${k===cur?' aria-current="page"':''}>${t}</button>`).join('');
+function tabsNav(tabs,cur,pick){$('#top').classList.toggle('two',tabs.length>4&&tabs[3][0]==='mearn');$('#nav').innerHTML=tabs.map(([k,t])=>`<button id="tab-${k}" data-tab="${k}"${k===cur?' aria-current="page"':''}>${t}</button>`).join('');
   document.querySelectorAll('#nav [data-tab]').forEach(b=>b.onclick=()=>{pick(b.dataset.tab);scrollTo(0,0)})}
 
 if(!window.LEADS_CONFIG||!window.supabase){view.innerHTML='<div class="card"><h2>Sign-in is being set up</h2><p class="mute">Check back soon.</p></div>'}
@@ -210,7 +211,7 @@ const tierRank={hot:0,warm:1,cold:2};
 const byRank=(a,b)=>(tierRank[a.tier]??3)-(tierRank[b.tier]??3)||(b.google_reviews||0)-(a.google_reviews||0)||a.id-b.id;
 
 async function route(){
-  A.live=false; VA=null; ADM=false; $('#vas').hidden=true; $('#nav').innerHTML=''; $('#ann').innerHTML=''; if(recovering)return; head();
+  A.live=false; VA=null; ADM=false; $('#vas').hidden=true; $('#nav').innerHTML=''; $('#top').classList.remove('two'); D='team'; C.tab='leads'; M.tab='team'; $('#ann').innerHTML=''; if(recovering)return; head();
   if(!user)return showAuth();
   view.innerHTML=LOADING;
   const {data,error}=await sb.rpc('my_state2');
@@ -294,8 +295,22 @@ const GUIDE=`<details class="guide" id="guide"><summary>Your job and the call sc
 <p class="warn">Keep it true. Do not say a website has already been made for them unless the manager has confirmed one exists for that business. Do not make up search results, numbers or reasons to rush. Do not promise they will make more money.</p></div></details>`;
 function wireGuide(){const g=document.getElementById('guide');if(!g)return;let shut=false;try{shut=localStorage.getItem('guideShut')==='1'}catch(e){}g.open=!shut;g.ontoggle=()=>{try{localStorage.setItem('guideShut',g.open?'0':'1')}catch(e){}}}
 let C={tab:'leads'};
+/* A manager who is also a cold caller gets both sets of sections in one bar. D is the section showing; the caller and
+   manager screens keep their own tab state, and the set that is not showing is blanked so a slow answer cannot draw over it. */
+let D='team';
+const dual=()=>!!(ME&&ME.role==='manager'&&ME.also_caller), MINE=['leads','book','rank','earn'];
+function showBoth(){
+  tabsNav([['team','My team'],['calls','Every call'],['funnel','Team funnel'],['mearn','Team earnings'],['leads','My leads'],['book','My bookings'],['rank','My rank'],['earn','My earnings']],D,t=>{D=t;showBoth()});
+  const mine=MINE.includes(D); C.tab=mine?D:''; M.tab=mine?'':D==='mearn'?'earn':D;
+  const on=document.getElementById('tab-'+D); if(on&&on.scrollIntoView)on.scrollIntoView({block:'nearest',inline:'center'});
+  return mine?callerTab():managerTab();
+}
 function showCaller(){
+  if(dual())return showBoth();
   tabsNav([['leads','My leads'],['book','My bookings'],['rank','Rank'],['earn','Earnings']],C.tab,t=>{C.tab=t;showCaller()});
+  return callerTab();
+}
+function callerTab(){
   return C.tab==='leads'?showMyLeads():C.tab==='book'?showBookings():C.tab==='rank'?showRank():showEarnings();
 }
 async function showBookings(){
@@ -356,7 +371,11 @@ const offBtn=n=>'<button data-done>Check off</button>'+(n?` <span class="reg">tr
 /* ---------- manager: their own team only ---------- */
 let M={tab:'team',fc:'',fs:''};
 function showManager(){
+  if(dual())return showBoth();
   tabsNav([['team','My team'],['calls','Every call'],['funnel','Team funnel'],['earn','Earnings']],M.tab,t=>{M.tab=t;showManager()});
+  return managerTab();
+}
+function managerTab(){
   return M.tab==='team'?mTeam():M.tab==='earn'?mEarn():mCalls();
 }
 async function mTeam(){
@@ -414,7 +433,7 @@ async function showAdmin(){
 }
 /* Live updates: every few seconds the admin panel re-reads the data and redraws only if something changed,
    keeping filters, typed numbers, ticked leads and scroll position. */
-const sig=()=>JSON.stringify([A.callers.map(c=>[c.id,c.status,c.full_name,c.role,c.manager_id,c.mgr_rate]),A.leads.map(l=>[l.id,l.assigned_to,l.completed_at,l.outcome,l.meet,l.sale_amount,l.customer_paid_at,l.comm_paid_at,l.mgr_paid_at]),A.ranks,A.invites,A.mgrRate,A.bookUrl,A.anns]);
+const sig=()=>JSON.stringify([A.callers.map(c=>[c.id,c.status,c.full_name,c.role,c.manager_id,c.mgr_rate,c.also_caller]),A.leads.map(l=>[l.id,l.assigned_to,l.completed_at,l.outcome,l.meet,l.sale_amount,l.customer_paid_at,l.comm_paid_at,l.mgr_paid_at]),A.ranks,A.invites,A.mgrRate,A.bookUrl,A.anns]);
 async function poll(){
   if(!A.live||A.busy||document.hidden||!user||VA)return;
   const d=await loadAdmin();
@@ -452,7 +471,7 @@ function drawAdmin(){
   const done=A.leads.filter(l=>l.completed_at).sort((a,b)=>new Date(b.completed_at)-new Date(a.completed_at)), open=A.leads.filter(l=>!l.completed_at);
   const held={}; open.forEach(l=>{if(l.assigned_to)held[l.assigned_to]=(held[l.assigned_to]||0)+1});
   const booked=done.filter(l=>l.outcome==='booked').length;
-  const free=open.filter(l=>!l.assigned_to).length, pending=A.callers.filter(c=>c.status==='pending'), accepted=A.callers.filter(c=>c.status==='accepted'&&c.role!=='manager'), managers=A.callers.filter(c=>c.status==='accepted'&&c.role==='manager');
+  const free=open.filter(l=>!l.assigned_to).length, pending=A.callers.filter(c=>c.status==='pending'), accepted=A.callers.filter(c=>c.status==='accepted'&&(c.role!=='manager'||c.also_caller)), managers=A.callers.filter(c=>c.status==='accepted'&&c.role==='manager');
   const sold=done.filter(l=>l.meet==='sale'), paidSales=sold.filter(l=>l.customer_paid_at), waiting=done.filter(l=>l.outcome==='booked'&&!l.meet);
   const s30={}; paidSales.forEach(l=>{if(in30(l.customer_paid_at)&&l.completed_by)s30[l.completed_by]=(s30[l.completed_by]||0)+1});
   const rankOf=id=>{let k=A.ranks[0]||{name:'',rate:0};A.ranks.forEach(r=>{if((s30[id]||0)>=r.min_sales&&r.min_sales>=k.min_sales)k=r});return k}, rankTxt=id=>{const r=rankOf(id);return `${esc(r.name)} · ${+r.rate}%`};
@@ -519,12 +538,12 @@ function drawAdmin(){
       <div class="bar"><label class="small" style="margin:0" for="ft">Assign from</label><select id="ft" aria-label="Tier"><option value="">Any tier</option><option>hot</option><option>warm</option><option>cold</option></select>
       <select id="fr" aria-label="Area"><option value="">Any area</option>${regions.map(r=>`<option>${esc(r)}</option>`).join('')}</select></div>
       <div class="wrap"><table class="stack"><thead><tr><th>Caller</th><th>Rank</th><th>Manager</th><th class="num">Leads held</th><th>Assign more</th><th></th></tr></thead><tbody>${accepted.map(c=>
-      `<tr><td><div class="nm">${esc(c.full_name)}</div><div class="reg">${esc(c.email)}</div></td><td>${rankTxt(c.id)}</td><td><select data-mgr="${esc(c.id)}" aria-label="Manager for ${esc(c.full_name)}"><option value="">No manager</option>${managers.map(m=>`<option value="${esc(m.id)}"${c.manager_id===m.id?' selected':''}>${esc(m.full_name)}</option>`).join('')}</select></td><td class="num held">${held[c.id]||0}</td>
+      `<tr><td><div class="nm">${esc(c.full_name)}</div><div class="reg">${esc(c.email)}</div></td><td>${rankTxt(c.id)}</td><td>${c.role==='manager'?'<span class="mute">Is a manager</span>':`<select data-mgr="${esc(c.id)}" aria-label="Manager for ${esc(c.full_name)}"><option value="">No manager</option>${managers.map(m=>`<option value="${esc(m.id)}"${c.manager_id===m.id?' selected':''}>${esc(m.full_name)}</option>`).join('')}</select>`}</td><td class="num held">${held[c.id]||0}</td>
       <td class="act"><div class="grp"><input type="number" min="1" max="${free}" value="${Math.min(25,free)||1}" aria-label="How many leads"> <button class="pri" data-assign="${esc(c.id)}" ${free?'':'disabled'}>Assign</button></div></td>
-      <td class="act end"><button data-takeback="${esc(c.id)}" ${held[c.id]?'':'disabled'}>Take back all</button> <button data-role="manager" data-id="${esc(c.id)}">Make manager</button> <button class="danger" data-status="rejected" data-id="${esc(c.id)}">Remove</button></td></tr>`).join('')}</tbody></table></div>`
+      <td class="act end"><button data-takeback="${esc(c.id)}" ${held[c.id]?'':'disabled'}>Take back all</button> ${c.role==='manager'?`<button data-also="0" data-id="${esc(c.id)}">Stop cold calling</button>`:`<button data-role="manager" data-id="${esc(c.id)}">Make manager</button>`} <button class="danger" data-status="rejected" data-id="${esc(c.id)}">Remove</button></td></tr>`).join('')}</tbody></table></div>`
       :'<p class="mute">No accepted callers yet. Accept an application above and they appear here.</p>')+'</section>';
-    h+=`<section class="sec"><div class="pagehead"><h2>Managers</h2><span class="stat">${managers.length}</span></div>`+(managers.length?tbl(['Manager','#Callers','#Team sales paid, 30 days','#Their cut of team sales %',''],managers.map(m=>{const team=accepted.filter(c=>c.manager_id===m.id);
-      return `<tr><td><div class="nm">${esc(m.full_name)}</div><div class="reg">${esc(m.email)}</div></td><td class="num">${team.length}</td><td class="num held">${team.reduce((a,c)=>a+(s30[c.id]||0),0)}</td><td class="num"><input id="mr-${esc(m.id)}" data-mrate="${esc(m.id)}" type="number" min="0" max="100" step="0.5" value="${mgrCut(m)}" style="width:84px" aria-label="Cut for ${esc(m.full_name)}"></td><td class="act end"><button data-role="caller" data-id="${esc(m.id)}">Make cold caller</button> <button class="danger" data-status="rejected" data-id="${esc(m.id)}">Remove</button></td></tr>`}),'stack')
+    h+=`<section class="sec"><div class="pagehead"><h2>Managers</h2><span class="stat">${managers.length}</span></div>`+(managers.length?'<p class="mute small">"Also a cold caller" lets a manager keep their team and also work their own leads. They then appear in the Callers list above, where you assign them leads.</p>'+tbl(['Manager','#Callers','#Team sales paid, 30 days','#Their cut of team sales %',''],managers.map(m=>{const team=accepted.filter(c=>c.manager_id===m.id);
+      return `<tr><td><div class="nm">${esc(m.full_name)}</div><div class="reg">${esc(m.email)}</div>${m.also_caller||held[m.id]?`<div class="reg">${m.also_caller?'Also a cold caller · ':''}${held[m.id]||0} lead${held[m.id]===1?'':'s'} held</div>`:''}</td><td class="num">${team.length}</td><td class="num held">${team.reduce((a,c)=>a+(s30[c.id]||0),0)}</td><td class="num"><input id="mr-${esc(m.id)}" data-mrate="${esc(m.id)}" type="number" min="0" max="100" step="0.5" value="${mgrCut(m)}" style="width:84px" aria-label="Cut for ${esc(m.full_name)}"></td><td class="act end">${m.also_caller?`<button data-also="0" data-id="${esc(m.id)}">Stop cold calling</button>`:`<button data-also="1" data-id="${esc(m.id)}">Also a cold caller</button>`} ${held[m.id]&&!m.also_caller?`<button data-takeback="${esc(m.id)}">Take back leads</button> `:''}<button data-role="caller" data-id="${esc(m.id)}">Cold caller only</button> <button class="danger" data-status="rejected" data-id="${esc(m.id)}">Remove</button></td></tr>`}),'stack')
       :'<p class="mute">No managers yet. Use "Make manager" on a caller, or add one by email.</p>')+'</section>';
     const rej=A.callers.filter(c=>c.status==='rejected');
     if(rej.length)h+=`<details class="sec" id="rej"${A.rejOpen?' open':''}><summary>Rejected or removed<span class="badge">${rej.length}</span></summary><div class="wrap"><table><tbody>${rej.map(c=>`<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.email)}</td><td class="act end"><button data-status="accepted" data-id="${esc(c.id)}">Accept</button></td></tr>`).join('')}</tbody></table></div></details>`;
@@ -556,6 +575,7 @@ function drawAdmin(){
   view.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{b.disabled=true;act(sb.rpc('admin_set_status',{p_caller:b.dataset.id,p_status:b.dataset.status}),b.dataset.status==='accepted'?'Accepted. They start with no leads.':'Done. Any leads they held are unassigned again.')});
   view.querySelectorAll('[data-assign]').forEach(b=>b.onclick=()=>{const n=parseInt(b.previousElementSibling.value,10);if(!(n>0))return;b.disabled=true;
     act(sb.rpc('admin_assign',{p_caller:b.dataset.assign,p_count:n,p_tier:$('#ft').value||null,p_region:$('#fr').value||null}),d=>d===n?`Assigned ${d} leads.`:`Assigned ${d} leads (only ${d} unassigned leads matched).`)});
+  view.querySelectorAll('[data-also]').forEach(b=>b.onclick=()=>{const on=b.dataset.also==='1';b.disabled=true;act(sb.rpc('admin_set_also_caller',{p_person:b.dataset.id,p_on:on}),on?'They are now a manager and a cold caller. They are in the Callers list, so you can assign them leads.':'They are a manager only now. Any leads they still hold stay with them until you take them back.')});
   view.querySelectorAll('[data-takeback]').forEach(b=>b.onclick=()=>{b.disabled=true;act(sb.rpc('admin_unassign_caller',{p_caller:b.dataset.takeback}),d=>`Took back ${d} leads.`)});
   view.querySelectorAll('[data-reopen]').forEach(b=>b.onclick=()=>{b.disabled=true;act(sb.rpc('admin_reopen_ids',{p_ids:[+b.dataset.reopen]}),d=>d?'Put back. It is an open lead again.':'Not put back: it already has a Meet result.')});
   view.querySelectorAll('[data-mgr]').forEach(b=>b.onchange=()=>{b.blur();act(sb.rpc('admin_set_manager',{p_caller:b.dataset.mgr,p_manager:b.value||null}),'Manager updated.')});
