@@ -88,6 +88,15 @@ td.ph{font-weight:500}.stat{font-size:12px}
 td a,.mine .c-biz a{font-weight:500;text-decoration:underline;text-decoration-color:var(--line);text-decoration-thickness:1px}td a:hover{text-decoration-color:currentColor}td.ph a{text-decoration:none}
 .wrap.attn{border-color:var(--ring)}
 button.link{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.guide{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin:0 0 20px}
+.guide summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px}.guide .gb{padding:0 16px 16px;max-width:68ch}
+.guide h3{font-size:12px;font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin:20px 0 8px}.guide h3:first-child{margin-top:4px}
+.guide .goal{font-size:17px;font-weight:600;letter-spacing:-.01em;margin:0 0 4px}
+.guide ol{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:8px}.guide li{display:grid;grid-template-columns:76px 1fr;gap:2px 12px;padding:10px 12px;border-top:1px solid var(--line)}.guide li:first-child{border-top:0}
+.guide li b{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);padding-top:3px}.guide li.me{background:var(--panel)}.guide li.me b{color:var(--ink)}
+.guide li span{font-weight:600}.guide li small{grid-column:2;font-size:13px;color:var(--mute)}
+.guide .say{margin:0 0 8px;padding:12px 14px;background:var(--panel);border-radius:8px;font-size:15px;line-height:1.5}.guide p{margin:0 0 8px}
+.guide .warn{padding:10px 12px;border-radius:8px;background:var(--warmbg);color:var(--warm);font-size:14px;margin:8px 0 0}
 @media (max-width:760px){.mine .ph a{text-decoration:none;font-family:var(--mono);font-weight:600}.mine .c-biz a{text-decoration:none}.mine .c-biz{flex:1 1 calc(100% - 90px)}
 .stack thead{display:none}.stack,.stack tbody{display:block}.stack tr{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:14px;border-bottom:1px solid var(--line)}.stack tr:last-child{border-bottom:0}
 .stack td{display:block;padding:0;border:0;text-align:left}.stack td:empty{display:none}.stack td:first-child{flex:1 1 55%}.stack td.held::after{content:" held";font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:12px;font-weight:400;color:var(--mute)}
@@ -185,17 +194,34 @@ function showApply(){
     const {error}=await sb.rpc('apply_as_caller',{p_name:$('#nm').value,p_phone:$('#ph').value,p_note:$('#nt').value});
     if(error)return say($('#msg'),error.message,'bad'); route()};
 }
+
+const GUIDE=`<details class="guide" id="guide"><summary>Your job, in one minute</summary><div class="gb">
+<h3>Your one goal</h3><p class="goal">Book a Google Meet between the business owner and Joel.</p>
+<p class="mute">That is the whole job. You do not sell, talk price or take payment. Joel is the closer.</p>
+<h3>Who does what</h3><ol>
+<li class="me"><b>Top</b><span>You, the cold caller</span><small>Call the business and book a Google Meet with Joel.</small></li>
+<li><b>Middle</b><span>Joel</span><small>Meets everyone who booked and shows them the website.</small></li>
+<li><b>Bottom</b><span>Joel</span><small>Closes the sale and takes the payment. If the sale closes, you earn your commission.</small></li></ol>
+<h3>What to say</h3>
+<p class="say">"Hi, is this the owner of [business]? I'm [your name]. We build websites for local businesses like yours. Joel, who makes them, can show you yours on a quick Google Meet. Would [day] at [time] work?"</p>
+<p class="mute small">If a demo website already exists for that business, say this instead:</p>
+<p class="say">"We've already made a demo website for [business]. Joel can walk you through it on a quick Google Meet. Would [day] at [time] work?"</p>
+<p class="warn">Only say a demo website has already been made when Joel has confirmed one exists for that business. If you are not sure, use the first version.</p>
+<h3>After the call</h3>
+<p><b>They said yes:</b> get their name, email and the day and time, pass them to Joel, then press Check off and "Booked a call".</p>
+<p><b>They said no:</b> thank them, then press Check off and "No booking".</p></div></details>`;
+function wireGuide(){const g=document.getElementById('guide');if(!g)return;let shut=false;try{shut=localStorage.getItem('guideShut')==='1'}catch(e){}g.open=!shut;g.ontoggle=()=>{try{localStorage.setItem('guideShut',g.open?'0':'1')}catch(e){}}}
 async function showMyLeads(){
   const {data,error}=await sb.from('leads').select('*').limit(5000);
   if(error){view.innerHTML=`<p class="note bad">${esc(error.message)}</p>`;return}
   const rows=(data||[]).sort(byRank);
-  if(!rows.length){view.innerHTML='<div class="pagehead"><h2>Your leads</h2></div><div class="wrap"><div class="empty">You have no leads to call right now. New ones appear here when the admin assigns them.</div></div><div class="row top"><button id="again">Check again</button></div>';$('#again').onclick=showMyLeads;return}
-  view.innerHTML=`<div class="pagehead"><h2>Your leads</h2><span class="stat" id="cnt"></span></div>
+  if(!rows.length){view.innerHTML=GUIDE+'<div class="pagehead"><h2>Your leads</h2></div><div class="wrap"><div class="empty">You have no leads to call right now. New ones appear here when the admin assigns them.</div></div><div class="row top"><button id="again">Check again</button></div>';$('#again').onclick=showMyLeads;wireGuide();return}
+  view.innerHTML=GUIDE+`<div class="pagehead"><h2>Your leads</h2><span class="stat" id="cnt"></span></div>
   <div class="bar"><input id="q" type="search" placeholder="Search name, town, type" aria-label="Search your leads"></div><p id="msg" role="status"></p>
   <div class="wrap"><table class="mine"><thead><tr><th>Phone</th><th>Business</th><th>Town</th><th>Type</th><th class="num">Rating</th><th class="num">Reviews</th><th>Tier</th><th>Best time to call</th><th>After the call</th></tr></thead>
   <tbody>${rows.map(l=>`<tr data-id="${l.id}">${leadCells(l)}<td class="c-time">${esc(l.best_time_to_call)}<div class="reg">${esc(l.local_time_zone)}</div></td><td class="act"><button data-done>Check off</button></td></tr>`).join('')}</tbody></table></div>`;
   let trs=[...view.querySelectorAll('tbody tr')]; const go=()=>{const s=$('#q').value.toLowerCase();let k=0;trs.forEach(r=>{const ok=r.textContent.toLowerCase().includes(s);r.hidden=!ok;if(ok)k++});$('#cnt').textContent=k+' of '+trs.length+' leads'};
-  $('#q').oninput=go;go();
+  $('#q').oninput=go;go();wireGuide();
   view.querySelector('tbody').onclick=async e=>{
     const b=e.target.closest('button'); if(!b)return; const tr=b.closest('tr'), cell=b.closest('td');
     if('done' in b.dataset){cell.innerHTML='<button class="pri" data-res="1">Booked a call</button> <button data-res="0">No booking</button> <button class="link" data-cancel>Cancel</button>';return}
