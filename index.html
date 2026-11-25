@@ -79,7 +79,7 @@ function showInfo(t,b){view.innerHTML=`<div class="card"><h2>${esc(t)}</h2><p cl
 function showAuth(mode='in'){
   const up=mode==='up';
   view.innerHTML=`<div class="card"><h2>${up?'Create an account':'Sign in'}</h2>
-  <p class="mute small">${up?'Use your own email. You will get a link to confirm it, then you can apply as a cold caller.':'Cold callers and admins sign in here.'}</p>
+  <p class="mute small">${up?'Use your own email and choose a password. Then you can apply as a cold caller.':'Cold callers and admins sign in here.'}</p>
   <form id="f"><label for="em">Email</label><input id="em" type="email" autocomplete="email" required>
   <label for="pw">Password</label><input id="pw" type="password" autocomplete="${up?'new-password':'current-password'}" minlength="8" required>
   <div class="row top"><button class="pri" type="submit">${up?'Create account':'Sign in'}</button>
@@ -96,7 +96,7 @@ function showAuth(mode='in'){
     if(up){
       const {data,error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:here}});
       if(error)return say(msg,error.message,'bad');
-      if(!data.session)say(msg,'Check your email and open the confirmation link, then sign in here.','ok');
+      if(!data.session)say(msg,'That email may already have an account. Try signing in instead.','bad');
     }else{
       const {error}=await sb.auth.signInWithPassword({email,password});
       if(error)say(msg,/not confirmed/i.test(error.message)?'Confirm your email first: open the link we sent you.':error.message,'bad');
