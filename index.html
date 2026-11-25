@@ -122,11 +122,13 @@ td select{height:32px;font-size:13px;width:auto;max-width:180px}td input[type=nu
 #top .in{flex-wrap:wrap}.rank{grid-template-columns:1fr}.sum.s3{grid-template-columns:1fr}.sum.s3 div{border-left:0;border-top:1px solid var(--line)}.sum.s3 div:first-child{border-top:0}.acct{gap:8px}#who{display:none}.rolebadge i{display:none}.mine td.act .bkf{width:100%}.mine td.act .bkf button{flex:none}
 #nav{scrollbar-width:none}#nav::-webkit-scrollbar{display:none}.bar.sel select{flex:1 1 100%}.bar.sel #give,.bar.sel #take{flex:1;height:40px}}
 #top.two .in{flex-wrap:wrap}#top.two #nav{order:3;flex:1 1 100%;overflow-x:auto;scrollbar-width:none}#top.two #nav::-webkit-scrollbar{display:none}#top.two #nav button{min-height:44px}@media(max-width:560px){#top.two #vas{max-width:110px!important}}#top.two #tab-leads{margin-left:8px;padding-left:20px;border-left:1px solid var(--line)}
+.docs ul{margin:0 0 8px;padding-left:20px}.docs a{color:var(--link);text-decoration:underline;text-underline-offset:3px}.docs li{margin:0 0 6px}.docs a,.docs .gb{overflow-wrap:anywhere}.fill{background:var(--warmbg);color:var(--warm);padding:1px 5px;border-radius:4px;font-size:.93em}.warn2{max-width:68ch;padding:10px 12px;border-radius:8px;background:var(--warmbg);color:var(--warm);font-size:14px;margin:0 0 16px}#docv .pagehead{max-width:calc(68ch + 34px)}#foot{max-width:1180px;margin:0 auto;padding:0 16px 40px;font-size:13px}
 </style></head><body><header id="top"><div class="in"><h1>Leads</h1><nav id="nav" aria-label="Sections"></nav><div class="acct"><select id="vas" aria-label="View as" hidden style="width:auto;height:30px;font-size:13px;max-width:190px"></select><span id="who"></span><span id="badge" class="rolebadge" hidden></span><button id="out" hidden>Sign out</button></div></div></header>
 <main>
 <div id="ann"></div>
 <div id="view"><div class="skel" aria-label="Loading"><i></i><i></i><i></i></div></div>
-</main>
+<div id="docv" style="display:none"></div></main>
+<footer id="foot"><button class="link" id="docs">Legal and tax documents</button></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
 <script src="config.js"></script>
 <script>
@@ -185,6 +187,71 @@ async function viewAs(v){
   return kind==='manager'?showManager():showCaller();
 }
 new MutationObserver(()=>{if(VA)view.querySelectorAll('button:not(:disabled)').forEach(b=>{b.disabled=true;b.title='Read-only while viewing as someone else'})}).observe(view,{childList:true,subtree:true});
+const DOCS=`<div class="pagehead"><h2>Legal and tax documents</h2><button id="docback">Back</button></div>
+<p class="warn2"><b>Drafts.</b> These are plain-language templates, not legal or tax advice. Nothing here is in effect until the business has completed the highlighted blanks, had a lawyer or accountant review it, and you have both signed where a signature is needed.</p>
+<details class="guide docs" open><summary>Tax forms: what you need to hand in</summary><div class="gb">
+<p>This section assumes cold callers and managers are paid as independent contractors, which your signed agreement will confirm. In that case no tax is taken out of what you are paid, so you are responsible for reporting your earnings and paying your own taxes.</p>
+<h3>Form W-9</h3>
+<p>Expect to be asked for a completed IRS Form W-9 before you are paid. Use the official form from the IRS: <a href="https://www.irs.gov/forms-pubs/about-form-w-9" target="_blank" rel="noopener">About Form W-9 (irs.gov)</a>.</p>
+<p class="warn">Do not upload your W-9 to this site or type your Social Security or tax ID number anywhere on it. This site never asks for them. The business will tell you directly how to hand the form in. Until then keep it yourself, and do not send it by email or text.</p>
+<p class="mute">If you are not a U.S. person for tax purposes, a W-9 is the wrong form. Ask before filling anything in.</p>
+<h3>Form 1099-NEC</h3>
+<p>If what you are paid in a calendar year reaches the IRS reporting threshold, the business sends you a Form 1099-NEC early the next year showing the total, and reports the same total to the IRS. You owe tax on your earnings whether or not you receive one. <a href="https://www.irs.gov/forms-pubs/about-form-1099-nec" target="_blank" rel="noopener">About Form 1099-NEC (irs.gov)</a></p>
+<h3>Paying your own taxes</h3>
+<p>The IRS explains self-employment tax and quarterly estimated payments here: <a href="https://www.irs.gov/businesses/small-businesses-self-employed/self-employed-individuals-tax-center" target="_blank" rel="noopener">Self-Employed Individuals Tax Center (irs.gov)</a>. Your state may have its own rules. An accountant can tell you what applies to you.</p>
+</div></details>
+<details class="guide docs"><summary>Independent contractor agreement (draft)</summary><div class="gb">
+<p class="mute">Draft template for lawyer review. Not in effect until signed by both sides.</p>
+<p>This agreement is between <span class="fill">[business legal name and address]</span> ("the business") and the person signing below ("you").</p>
+<h3>1. The work</h3>
+<p>You call the businesses assigned to you through this site and book demo meetings for the business. If you are a manager, you also recruit and support the cold callers on your team. You do not sell, quote prices or take payment.</p>
+<h3>2. Independent contractor</h3>
+<p>You are an independent contractor, not an employee. You choose when, where and how much you work, and you use your own phone and equipment. You receive no wages, benefits, insurance or expense reimbursement, and you are responsible for your own taxes. You may not sign anything or make promises on behalf of the business.</p>
+<h3>3. Pay</h3>
+<ul><li>Pay is commission only. Calls and bookings that do not become a paid sale earn nothing.</li>
+<li>A cold caller earns a percentage of each sale that comes from a meeting they booked. The percentage is the one shown for their rank on this site when the sale is recorded.</li>
+<li>A manager earns the manager percentage shown on this site on sales that come from their team's bookings.</li>
+<li>Commission is earned only when the customer has paid the business. If a customer payment is refunded or reversed, <span class="fill">[what happens to commission on a refunded sale]</span>.</li>
+<li>Earned commission is paid <span class="fill">[how and when payouts are made]</span>. The records on this site show what is earned and what is still owed.</li></ul>
+<h3>4. Leads and confidential information</h3>
+<p>The lead lists, call script, customer details and anything else you see on this site belong to the business. Use them only for this work. Do not copy, export, share or sell them, and stop using them when this agreement ends.</p>
+<h3>5. How you make calls</h3>
+<p>Be honest about who you are and why you are calling. Do not make claims the business has not given you. If someone asks not to be called again, stop and record it. Follow the telemarketing and do-not-call laws that apply to the calls you make.</p>
+<h3>6. Ending the agreement</h3>
+<p>Either side can end this agreement at any time by telling the other in writing. Commission already earned is still paid. For meetings you booked before the end date that turn into paid sales afterwards, <span class="fill">[whether commission is still paid on those sales]</span>.</p>
+<h3>7. General</h3>
+<p>This is the whole agreement about this work and can be changed only in writing signed by both sides. It is governed by the laws of <span class="fill">[state]</span>.</p>
+<h3>Signatures</h3>
+<p>Business: ______________________ Date: __________<br>Contractor name: ______________________<br>Contractor signature: ______________________ Date: __________</p>
+</div></details>
+<details class="guide docs"><summary>Privacy notice (draft)</summary><div class="gb">
+<p class="mute">Draft for review.</p>
+<h3>What this site keeps about you</h3>
+<ul><li>Your email address and name, and the phone number and note you gave when you applied.</li>
+<li>Your role, your manager or team, and your rank.</li>
+<li>The calls you complete, the meetings you book, and the sales, commission and payouts recorded against them.</li></ul>
+<p>This site does not ask for or store Social Security numbers, tax IDs, bank details or signed forms.</p>
+<h3>Who can see it</h3>
+<p>The admin sees everything. A manager sees the names and results of the callers on their team. A cold caller sees only their own leads, bookings and earnings.</p>
+<h3>Where it is kept</h3>
+<p>Accounts and records are stored with Supabase, a database hosting provider. The page itself is served by GitHub Pages. The page loads one code library from the jsDelivr network, and your browser keeps your sign-in so you stay signed in. The site has no advertising or analytics trackers, and your information is not sold.</p>
+<h3>Business owners on the lead list</h3>
+<p>Leads are businesses with a publicly listed phone number. When a meeting is booked, the owner's name, email and meeting time are recorded so the meeting can happen.</p>
+<h3>Questions or removal</h3>
+<p>To ask what is held about you, or to have your account removed, contact <span class="fill">[contact email]</span>.</p>
+</div></details>
+<details class="guide docs"><summary>Terms of use (draft)</summary><div class="gb">
+<p class="mute">Draft for review.</p>
+<ul><li>This site is for people the business has accepted as cold callers or managers. Access can be removed at any time.</li>
+<li>Keep your sign-in to yourself. You are responsible for what is done with your account.</li>
+<li>Everything on the site is confidential business information. Do not copy, scrape or share it.</li>
+<li>Record call outcomes and bookings truthfully.</li>
+<li>The figures shown are the business's records. If you think one is wrong, say so promptly. Pay is governed by your signed contractor agreement.</li>
+<li>The site is provided as it is and may change or be unavailable at times.</li></ul>
+</div></details>`;
+function showDocs(){const d=$('#docv');d.innerHTML=DOCS;d.style.display='';view.style.display='none';$('#foot').style.display='none';$('#docback').onclick=closeDocs;scrollTo(0,0)}
+function closeDocs(){const d=$('#docv');if(d.style.display==='none')return;d.style.display='none';d.innerHTML='';view.style.display='';$('#foot').style.display='';scrollTo(0,0)}
+$('#docs').onclick=showDocs; $('#nav').addEventListener('click',closeDocs); $('#vas').addEventListener('change',closeDocs);
 function tabsNav(tabs,cur,pick){$('#top').classList.toggle('two',tabs.length>4&&tabs[3][0]==='mearn');$('#nav').innerHTML=tabs.map(([k,t])=>`<button id="tab-${k}" data-tab="${k}"${k===cur?' aria-current="page"':''}>${t}</button>`).join('');
   document.querySelectorAll('#nav [data-tab]').forEach(b=>b.onclick=()=>{pick(b.dataset.tab);scrollTo(0,0)})}
 
@@ -211,6 +278,7 @@ const tierRank={hot:0,warm:1,cold:2};
 const byRank=(a,b)=>(tierRank[a.tier]??3)-(tierRank[b.tier]??3)||(b.google_reviews||0)-(a.google_reviews||0)||a.id-b.id;
 
 async function route(){
+  closeDocs();
   A.live=false; VA=null; ADM=false; $('#vas').hidden=true; $('#nav').innerHTML=''; $('#top').classList.remove('two'); D='team'; C.tab='leads'; M.tab='team'; $('#ann').innerHTML=''; if(recovering)return; head();
   if(!user)return showAuth();
   view.innerHTML=LOADING;
