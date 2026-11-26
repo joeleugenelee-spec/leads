@@ -421,6 +421,8 @@ async function route(){
   if(!data.status)return showApply();
   if(data.status==='pending')return showInfo('Application received','It is being reviewed. Come back to this page after you have been accepted.');
   if(data.status==='rejected')return showInfo('Application not accepted','Your application was not accepted. Contact the admin if you think this is a mistake.');
+  /* Connecting Discord is required before the site can be used (see discord.js). If the check itself fails, nobody is locked out. */
+  if(window.discordGate){const dz=await sb.rpc('my_discord');if(!dz.error&&dz.data&&dz.data.required&&!dz.data.name)return window.discordGate()}
   loadAnn();
   return data.role==='manager'?showManager():showCaller();
 }
