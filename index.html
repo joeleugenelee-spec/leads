@@ -178,7 +178,7 @@ body:not(.hasbar) #top .in{max-width:1180px}
 const $=s=>document.querySelector(s), view=$('#view');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const here=location.origin+location.pathname;
-const teamCode=(()=>{let c=new URLSearchParams(location.search).get('team')||'';c=/^[a-z0-9]{8,40}$/i.test(c)?c:'';try{if(c)localStorage.setItem('teamCode',c);else c=localStorage.getItem('teamCode')||''}catch(e){}return c})();
+const teamCode=(()=>{let c=new URLSearchParams(location.search).get('team')||'';c=/^[a-z0-9]{2,40}$/i.test(c)?c.toLowerCase():'';try{if(c)localStorage.setItem('teamCode',c);else c=localStorage.getItem('teamCode')||''}catch(e){}return c})();
 const LOADING='<div class="skel" aria-label="Loading"><i></i><i></i><i></i></div>';
 let sb, user=null, recovering=false, ME=null;
 const money=n=>'$'+Math.round(+n||0).toLocaleString();
@@ -216,7 +216,7 @@ async function api(name){
     team_earnings:()=>L.filter(l=>l.mgr_id===T&&l.meet==='sale'&&l.customer_paid_at).sort((a,b)=>new Date(b.customer_paid_at)-new Date(a.customer_paid_at)).map(l=>({...l,caller:l.completed_by_name})),
     team_applicants:()=>team.filter(x=>x.status==='pending'),
     my_notes:()=>(A.notes||[]).filter(n=>{const l=L.find(x=>x.id===n.lead_id);return l&&((l.assigned_to===T&&!l.completed_at)||l.completed_by===T)}),
-    my_invite_code:()=>c.invite_code||''}[name];
+    my_invite_code:()=>c.invite_slug||c.invite_code||''}[name];
   return{data:d?d():null,error:d?null:{message:'Not available in this view'}};
 }
 function fillVas(){const v=$('#vas');v.hidden=!ADM;if(!ADM)return;const ok=A.callers.filter(x=>x.status==='accepted'),opt=(k,x)=>`<option value="${k}:${esc(x.id)}"${VA&&VA.id===x.id?' selected':''}>${esc(x.full_name)}</option>`;
@@ -589,7 +589,7 @@ async function showAdmin(){
 }
 /* Live updates: every few seconds the admin panel re-reads the data and redraws only if something changed,
    keeping filters, typed numbers, ticked leads and scroll position. */
-const sig=()=>JSON.stringify([A.callers.map(c=>[c.id,c.status,c.full_name,c.role,c.manager_id,c.mgr_rate,c.also_caller]),A.leads.map(l=>[l.id,l.assigned_to,l.completed_at,l.outcome,l.meet,l.sale_amount,l.customer_paid_at,l.comm_paid_at,l.mgr_paid_at]),A.ranks,A.invites,A.mgrRate,A.bookUrl,A.anns,(A.notes||[]).length,A.insight&&A.insight.id,A.leads.map(l=>l.follow_up_at||0)]);
+const sig=()=>JSON.stringify([A.callers.map(c=>[c.id,c.status,c.full_name,c.role,c.manager_id,c.mgr_rate,c.also_caller,c.invite_slug]),A.leads.map(l=>[l.id,l.assigned_to,l.completed_at,l.outcome,l.meet,l.sale_amount,l.customer_paid_at,l.comm_paid_at,l.mgr_paid_at]),A.ranks,A.invites,A.mgrRate,A.bookUrl,A.anns,(A.notes||[]).length,A.insight&&A.insight.id,A.leads.map(l=>l.follow_up_at||0)]);
 async function poll(){
   if(!A.live||A.busy||document.hidden||!user||VA)return;
   const d=await loadAdmin();
@@ -758,7 +758,7 @@ function drawAdmin(){
       <td class="act end"><button data-takeback="${esc(c.id)}" ${held[c.id]?'':'disabled'}>Take back all</button> ${c.role==='manager'?`<button data-also="0" data-id="${esc(c.id)}">Stop cold calling</button>`:`<button data-role="manager" data-id="${esc(c.id)}">Make manager</button>`} <button class="danger" data-status="rejected" data-id="${esc(c.id)}">Remove</button></td></tr>`).join('')}</tbody></table></div>`
       :'<p class="mute">No accepted callers yet. Accept an application above and they appear here.</p>')+'</section>';
     h+=`<section class="sec"><div class="pagehead"><h2>Managers</h2><span class="stat">${managers.length}</span></div>`+(managers.length?'<p class="mute small">"Also a cold caller" lets a manager keep their team and also work their own leads. They then appear in the Callers list above, where you assign them leads.</p>'+tbl(['Manager','#Callers','#Team sales paid, 30 days','#Their cut of team sales %',''],managers.map(m=>{const team=accepted.filter(c=>c.manager_id===m.id);
-      return `<tr><td><div class="nm">${esc(m.full_name)}</div><div class="reg">${esc(m.email)}</div>${m.also_caller||held[m.id]?`<div class="reg">${m.also_caller?'Also a cold caller · ':''}${held[m.id]||0} lead${held[m.id]===1?'':'s'} held</div>`:''}</td><td class="num">${team.length}</td><td class="num held">${team.reduce((a,c)=>a+(s30[c.id]||0),0)}</td><td class="num"><input id="mr-${esc(m.id)}" data-mrate="${esc(m.id)}" type="number" min="0" max="100" step="0.5" value="${mgrCut(m)}" style="width:84px" aria-label="Cut for ${esc(m.full_name)}"></td><td class="act end">${m.also_caller?`<button data-also="0" data-id="${esc(m.id)}">Stop cold calling</button>`:`<button data-also="1" data-id="${esc(m.id)}">Also a cold caller</button>`} ${held[m.id]&&!m.also_caller?`<button data-takeback="${esc(m.id)}">Take back leads</button> `:''}<button data-role="caller" data-id="${esc(m.id)}">Cold caller only</button> <button class="danger" data-status="rejected" data-id="${esc(m.id)}">Remove</button></td></tr>`}),'stack')
+      return `<tr><td><div class="nm">${esc(m.full_name)}</div><div class="reg">${esc(m.email)}</div>${m.invite_slug?`<div class="reg">Invite link: ${esc(here.replace(/^https?:\/\//,''))}?team=${esc(m.invite_slug)}</div>`:''}${m.also_caller||held[m.id]?`<div class="reg">${m.also_caller?'Also a cold caller · ':''}${held[m.id]||0} lead${held[m.id]===1?'':'s'} held</div>`:''}</td><td class="num">${team.length}</td><td class="num held">${team.reduce((a,c)=>a+(s30[c.id]||0),0)}</td><td class="num"><input id="mr-${esc(m.id)}" data-mrate="${esc(m.id)}" type="number" min="0" max="100" step="0.5" value="${mgrCut(m)}" style="width:84px" aria-label="Cut for ${esc(m.full_name)}"></td><td class="act end">${m.also_caller?`<button data-also="0" data-id="${esc(m.id)}">Stop cold calling</button>`:`<button data-also="1" data-id="${esc(m.id)}">Also a cold caller</button>`} ${held[m.id]&&!m.also_caller?`<button data-takeback="${esc(m.id)}">Take back leads</button> `:''}<button data-role="caller" data-id="${esc(m.id)}">Cold caller only</button> <button class="danger" data-status="rejected" data-id="${esc(m.id)}">Remove</button></td></tr>`}),'stack')
       :'<p class="mute">No managers yet. Use "Make manager" on a caller, or add one by email.</p>')+'</section>';
     const rej=A.callers.filter(c=>c.status==='rejected');
     if(rej.length)h+=`<details class="sec" id="rej"${A.rejOpen?' open':''}><summary>Rejected or removed<span class="badge">${rej.length}</span></summary><div class="wrap"><table><tbody>${rej.map(c=>`<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.email)}</td><td class="act end"><button data-status="accepted" data-id="${esc(c.id)}">Accept</button></td></tr>`).join('')}</tbody></table></div></details>`;
