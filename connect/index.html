@@ -4,14 +4,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex" />
 <meta name="referrer" content="no-referrer" />
-<title>Connecting Discord · Moonshot Sites</title>
+<title>Moonshot Sites</title>
 <body style="margin:0;display:grid;place-items:center;min-height:100vh;font:16px -apple-system,BlinkMacSystemFont,sans-serif;color:#5e5870;background:#f6f5fa">
-<p>Connecting Discord…</p>
+<p>One moment…</p>
 <script>
   /*
-   * Discord sends the person back here after they approve the link. This page only carries the answer to the
-   * main page: it sits on its own address so the main page's sign-in code never mistakes Discord's answer
-   * for its own, and so the token leaves the address bar at once.
+   * The person lands here after approving the account link. This page only carries the answer back to the
+   * main page: it sits on its own address so the main page's sign-in code never mistakes that answer for its
+   * own, and so the answer leaves the address bar at once. Nothing is sent anywhere from this page.
    */
   (function () {
     var hash = new URLSearchParams(location.hash.replace(/^#/, ''));

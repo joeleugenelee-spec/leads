@@ -1,7 +1,7 @@
 /*
  * The "Connect Discord" box for accepted cold callers and managers. Loaded after the main script in index.html
  * and uses its sb, user, ME, VA and esc. The person approves the link on Discord's own page and comes back
- * through /discord/, which leaves Discord's answer in sessionStorage for finish() below. Once linked, their
+ * through /connect/, which leaves Discord's answer in sessionStorage for finish() below. Once linked, their
  * rank role in the Moonshot Sites Callers server follows the site by itself.
  * Connecting is required: route() in index.html calls discordGate() for an accepted person with no link, and
  * they see only the "Connect Discord" screen until they have linked. Admins are never asked.
@@ -28,7 +28,7 @@
   function start() {
     const state = Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
     try { sessionStorage.setItem('moonshot.discord.state', state); } catch (e) { /* the return is refused without it */ }
-    location.assign('https://discord.com/oauth2/authorize?' + new URLSearchParams({ client_id: APP, response_type: 'token', redirect_uri: location.origin + '/discord/', scope: 'identify guilds.join', state, prompt: 'consent' }));
+    location.assign('https://discord.com/oauth2/authorize?' + new URLSearchParams({ client_id: APP, response_type: 'token', redirect_uri: location.origin + '/connect/', scope: 'identify guilds.join', state, prompt: 'consent' }));
   }
 
   /* Back from Discord: hand its answer to the server once. Returns a line to show, or ''. */
