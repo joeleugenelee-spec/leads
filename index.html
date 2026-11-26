@@ -164,7 +164,7 @@ button.link{text-decoration:underline;text-decoration-color:var(--line);text-und
 #top .in{flex-wrap:nowrap}#nav{flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}#nav::-webkit-scrollbar{display:none}.acct{flex:none}#who{max-width:130px}#nav button{padding:0 10px}
 .tier.plain{text-transform:none;letter-spacing:0;font-family:inherit;font-size:12px}
 .sum.s3{grid-template-columns:repeat(3,1fr)}
-.rank{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:16px;margin:0 0 24px}.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.rank{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:16px;margin:0 0 24px}.box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
 .box h3{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin:0 0 8px}
 .big{font-size:28px;font-weight:650;letter-spacing:-.02em;margin:0}.rate{font-family:var(--mono);font-size:14px;color:var(--mute);margin:4px 0 0}
 .pb .l,.fr .l{display:flex;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;font-size:13px;margin:0 0 6px}.pb .l span:last-child,.fr .l>span:last-child{font-family:var(--mono);color:var(--mute)}
@@ -294,7 +294,7 @@ const emptyBox=t=>`<div class="wrap"><div class="empty">${t}</div></div>`;
 /* The page-top panel every section opens with, in the Rank page's shape: one headline figure, then what it means. */
 const hero=(num,unit,eyebrow,title,body,opts={})=>`<div class="hero"><div class="hnum"><b ${opts.money?'data-money ':''}data-count="${+num||0}">${opts.money?'$0':'0'}</b><span>${unit}</span></div><div class="hinfo"><p class="eyebrow">${eyebrow}</p><p class="hname">${title}</p>${body||''}</div></div>`;
 /* Counts every [data-count] figure up from zero once, as the Rank page does. Still when motion is turned down. */
-function countUp(root=view){const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function countUp(root=view,still=false){const calm=still||matchMedia('(prefers-reduced-motion: reduce)').matches;
   root.querySelectorAll('[data-count]').forEach(el=>{const to=+el.dataset.count,fmt=v=>('money' in el.dataset?'$':'')+Math.round(v).toLocaleString();if(calm||!to){el.textContent=fmt(to);return}
     const t0=performance.now(),dur=700+Math.min(600,to*20);const tick=t=>{const p=Math.min(1,(t-t0)/dur);el.textContent=fmt(to*(1-Math.pow(1-p,3)));if(p<1&&el.isConnected)requestAnimationFrame(tick)};requestAnimationFrame(tick)})}
 /* How a booking turns into pay, shown where a caller has nothing to list yet. The rate is their own. */
@@ -870,15 +870,18 @@ function managerTab(){
 async function mTeam(){
   view.innerHTML=LOADING; const [tm,ap,ic]=await Promise.all([api('team_members'),api('team_applicants'),api('my_invite_code')]); if(M.tab!=='team')return;
   const error=tm.error||ap.error||ic.error; if(error)return fail(error); const data=tm.data, link=ic.data?here+'?team='+encodeURIComponent(ic.data):'Created the first time they open this page';
-  view.innerHTML=`<p class="note ${M.note?M.note[1]:''}" id="note" role="status">${esc(M.note?M.note[0]:'')}</p>
-  <section class="sec"><div class="pagehead"><h2>Your invite link</h2></div><p class="mute small">Send this to people you want on your team. Anyone who applies through it is attached to you, and you accept them below.</p>
-  <div class="bar"><input id="ilink" readonly value="${esc(link)}" aria-label="Your invite link" style="flex:1;min-width:220px;max-width:520px"><button class="pri" id="icopy">Copy link</button></div></section>
+  const tot=k=>data.reduce((a,c)=>a+(+c[k]||0),0), wait=ap.data.length;
+  view.innerHTML=`<p class="note ${M.note?M.note[1]:''}" id="note" role="status">${esc(M.note?M.note[0]:'')}</p>`+
+  hero(data.length,data.length===1?'caller on your team':'callers on your team','My team',wait?`${wait} application${wait===1?'':'s'} waiting for you`:data.length?'Last 30 days':'Nobody yet',
+    data.length?`<p class="hsub"><b>${tot('calls')}</b> calls, <b>${tot('meets')}</b> Meets booked, <b>${tot('sold')}</b> sales closed and <b>${tot('paid')}</b> paid by the customer.</p>`:'<p class="hsub">Share your invite link below. Anyone who applies through it comes to you to accept.</p>')+`
+  <section class="sec"><div class="pagehead"><h2>Your invite link</h2></div><div class="box"><p class="mute small" style="margin:0 0 10px">Send this to people you want on your team. Anyone who applies through it is attached to you, and you accept them below.</p>
+  <div class="bar" style="margin:0"><input id="ilink" readonly value="${esc(link)}" aria-label="Your invite link" style="flex:1;min-width:220px;max-width:520px"><button class="pri" id="icopy">Copy link</button></div></div></section>
   <section class="sec"><div class="pagehead"><h2>Applications to your team</h2><span class="stat">${ap.data.length} waiting</span></div>`+
   (ap.data.length?`<div class="wrap attn"><table class="stack"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Note</th><th>Applied</th><th></th></tr></thead><tbody>${ap.data.map(c=>`<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}${appInfo(c)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td><td class="act end"><button class="pri" data-dec="1" data-id="${esc(c.id)}">Accept</button> <button data-dec="0" data-id="${esc(c.id)}">Reject</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="mute">No one is waiting. New applicants from your link appear here.</p>')+`</section>
   <section class="sec"><div class="pagehead"><h2>My team</h2><span class="stat">${data.length} caller${data.length===1?'':'s'} · last 30 days</span></div><p class="mute small">Everyone accepted onto your team. You see how they are doing; Joel assigns leads and closes sales.</p>`+
   (data.length?tbl(['Caller','Rank','#Leads held','#Calls','#Booked with Joel','#Sales closed','#Customer paid'],data.map(c=>`<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.rank_name)} · ${+c.rate}%</td><td class="num">${c.held}</td><td class="num">${c.calls}</td><td class="num">${c.meets}</td><td class="num">${c.sold}</td><td class="num held">${c.paid}</td></tr>`))
    :emptyBox('No callers on your team yet. Share your invite link, or Joel can add callers to your team.'))+'</section>';
-  M.note=null;
+  M.note=null; countUp();
   $('#icopy').onclick=async()=>{const i=$('#ilink');i.select();try{await navigator.clipboard.writeText(i.value);say($('#note'),'Link copied.','ok')}catch(e){say($('#note'),'Select the link and copy it.','bad')}};
   view.querySelectorAll('[data-dec]').forEach(b=>b.onclick=async()=>{b.closest('td').querySelectorAll('button').forEach(x=>x.disabled=true);const yes=b.dataset.dec==='1';
     const {error}=await sb.rpc('team_decide',{p_caller:b.dataset.id,p_accept:yes});M.note=error?[error.message,'bad']:[yes?'Accepted. They are on your team; Joel assigns their leads.':'Rejected.','ok'];mTeam()});
@@ -886,25 +889,30 @@ async function mTeam(){
 async function mCalls(){
   view.innerHTML=LOADING; const t=M.tab, {data,error}=await api('team_calls'); if(M.tab!==t)return; if(error)return fail(error);
   const n={calls:data.length,meets:data.filter(l=>l.outcome==='booked').length,sold:data.filter(l=>l.meet==='sale').length,paid:data.filter(l=>l.meet==='sale'&&l.customer_paid_at).length};
-  if(t==='funnel'){view.innerHTML=`<div class="pagehead"><h2>Team funnel</h2><span class="stat">last 30 days</span></div>`+funnel(n.calls,n.meets,n.sold,n.paid,data.filter(l=>l.customer_paid_at).reduce((a,l)=>a+(+l.sale_amount||0),0),'Sales value paid by customers');return}
+  if(t==='funnel'){view.innerHTML=hero(n.calls,n.calls===1?'cold call made':'cold calls made','Team funnel',n.calls?`${Math.round(n.meets/n.calls*100)}% of calls book a Meet`:'No calls yet',`<p class="hsub">Last 30 days. Each step shows how many made it through from the step above.</p>`)+funnel(n.calls,n.meets,n.sold,n.paid,data.filter(l=>l.customer_paid_at).reduce((a,l)=>a+(+l.sale_amount||0),0),'Sales value paid by customers');countUp();return}
   const who=[...new Map(data.map(l=>[l.caller_id,l.caller])).entries()];
+  let first=true;
   const draw=()=>{const f=data.filter(l=>(!M.fc||l.caller_id===M.fc)&&(!M.fs||(M.fs==='booked'?l.outcome==='booked':M.fs==='sold'?l.meet==='sale':l.meet==='sale'&&l.customer_paid_at)));
-    view.innerHTML=`<div class="pagehead"><h2>Every call</h2><span class="stat">${f.length} shown · last 30 days</span></div>
-    <dl class="sum"><div><dt>Calls made</dt><dd>${n.calls}</dd></div><div><dt>Booked with Joel</dt><dd>${n.meets}</dd></div><div><dt>Sales closed</dt><dd>${n.sold}</dd></div><div><dt>Customer paid</dt><dd>${n.paid}</dd></div></dl>
-    <div class="bar"><select id="mfc" aria-label="Caller"><option value="">Whole team</option>${who.map(([id,nm])=>`<option value="${esc(id)}"${M.fc===id?' selected':''}>${esc(nm)}</option>`).join('')}</select>
-    <select id="mfs" aria-label="Stage">${[['','Every call'],['booked','Booked with Joel'],['sold','Sale closed'],['paid','Customer paid']].map(([v,t2])=>`<option value="${v}"${M.fs===v?' selected':''}>${t2}</option>`).join('')}</select></div>`+
+    view.innerHTML=hero(n.calls,n.calls===1?'call made':'calls made','Every call','Your team, last 30 days',`<p class="hsub">Every lead your callers have checked off, and where each one stands now.</p>`)+`
+    <dl class="sum s3"><div><dt>Booked with Joel</dt><dd data-count="${n.meets}">${n.meets}</dd></div><div><dt>Sales closed</dt><dd data-count="${n.sold}">${n.sold}</dd></div><div><dt>Customer paid</dt><dd data-count="${n.paid}">${n.paid}</dd></div></dl>
+    <div class="bar listbar"><select id="mfc" aria-label="Caller"><option value="">Whole team</option>${who.map(([id,nm])=>`<option value="${esc(id)}"${M.fc===id?' selected':''}>${esc(nm)}</option>`).join('')}</select>
+    <select id="mfs" aria-label="Stage">${[['','Every call'],['booked','Booked with Joel'],['sold','Sale closed'],['paid','Customer paid']].map(([v,t2])=>`<option value="${v}"${M.fs===v?' selected':''}>${t2}</option>`).join('')}</select><span class="stat">${f.length} shown</span></div>`+
     (f.length?tbl(['Where it stands','Caller','Business','When','Town','#Sale'],f.slice(0,300).map(l=>`<tr><td>${chip(l)}</td><td class="nm">${esc(l.caller)}</td><td>${esc(l.business_name)}</td><td>${when(l.completed_at)}</td><td>${esc(l.city)}<div class="reg">${esc(l.region)}</div></td><td class="num">${l.meet==='sale'?money(l.sale_amount):'–'}</td></tr>`))+(f.length>300?'<p class="mute small" style="margin-top:8px">First 300 shown. Narrow it with the filters.</p>':'')
      :emptyBox('No calls to show yet. Each call your team checks off appears here.'));
+    if(first){first=false;countUp()}else view.querySelector('.hnum b').textContent=n.calls.toLocaleString();
     $('#mfc').onchange=e=>{M.fc=e.target.value;draw()};$('#mfs').onchange=e=>{M.fs=e.target.value;draw()}};
   draw();
 }
 async function mEarn(){
   view.innerHTML=LOADING; const {data,error}=await api('team_earnings'); if(M.tab!=='earn')return; if(error)return fail(error);
   const sum=k=>data.reduce((a,l)=>a+(+l[k]||0),0), owed=data.filter(l=>!l.mgr_paid_at).reduce((a,l)=>a+(+l.mgr_amount||0),0);
-  view.innerHTML=`<div class="pagehead"><h2>Earnings</h2></div><p class="mute small">You earn ${+ME.mgr_rate}% of every sale your team's bookings close, once the customer has paid. It comes on top of the caller's commission, not out of it.</p>
-  <dl class="sum s3"><div><dt>Team sales paid</dt><dd>${data.length}</dd></div><div><dt>Your earnings</dt><dd>${money(sum('mgr_amount'))}</dd></div><div><dt>Still owed to you</dt><dd>${money(owed)}</dd></div></dl>`+
-  (data.length?tbl(['Business','Caller','Customer paid','#Sale','#Your cut','#You earn','Status'],data.map(l=>`<tr><td class="nm">${esc(l.business_name)}</td><td>${esc(l.caller)}</td><td>${when(l.customer_paid_at)}</td><td class="num">${money(l.sale_amount)}</td><td class="num">${+l.mgr_rate}%</td><td class="num">${money(l.mgr_amount)}</td><td><span class="tier plain ${l.mgr_paid_at?'ok':'no'}">${l.mgr_paid_at?'Paid':'Owed'}</span></td></tr>`))
+  const got=sum('mgr_amount');
+  view.innerHTML=hero(got,'earned from your team','Team earnings',owed?`${money(owed)} still owed to you`:got?'All paid out':'Nothing earned yet',
+    `<p class="hsub">You earn <b>${+ME.mgr_rate}%</b> of every sale your team's bookings close, once the customer has paid. It comes on top of the caller's commission, not out of it.</p>`,{money:true})+
+  `<dl class="sum s3"><div><dt>Team sales paid</dt><dd data-count="${data.length}">0</dd></div><div><dt>Paid out to you</dt><dd data-money data-count="${Math.max(0,got-owed)}">$0</dd></div><div><dt>Still owed to you</dt><dd data-money data-count="${owed}">$0</dd></div></dl>`+
+  (data.length?`<div class="pagehead"><h2>Sale by sale</h2><span class="stat">${data.length} paid</span></div>`+tbl(['Business','Caller','Customer paid','#Sale','#Your cut','#You earn','Status'],data.map(l=>`<tr><td class="nm">${esc(l.business_name)}</td><td>${esc(l.caller)}</td><td>${when(l.customer_paid_at)}</td><td class="num">${money(l.sale_amount)}</td><td class="num">${+l.mgr_rate}%</td><td class="num">${money(l.mgr_amount)}</td><td><span class="tier plain ${l.mgr_paid_at?'ok':'no'}">${l.mgr_paid_at?'Paid':'Owed'}</span></td></tr>`))
    :emptyBox('No earnings yet. They appear here when a sale from your team is paid by the customer.'));
+  countUp();
 }
 
 /* ---------- admin ---------- */
@@ -1036,8 +1044,21 @@ function drawAdmin(){
   <button id="tab-rules" data-tab="rules"${cur('rules')}>Pay rules</button>
   <button id="tab-pay" data-tab="pay"${cur('pay')}>Payouts</button>
   <button id="tab-ann" data-tab="ann"${cur('ann')}>Announcements${(A.anns||[]).length?`<span class="badge">${A.anns.length}</span>`:''}</button>`;
-  let h=`<dl class="sum"><div><dt>Leads</dt><dd>${A.leads.length}</dd></div><div><dt>Unassigned</dt><dd>${free}</dd></div><div><dt>With callers</dt><dd>${open.length-free}</dd></div><div><dt>Completed</dt><dd>${done.length}</dd></div></dl>
-  <p class="note ${A.note[1]}" id="note" role="status">${esc(A.note[0])}</p>`;
+  /* Each section opens with the same panel as the Rank page: the one figure that matters there, and what it means. */
+  const owedAll=paidSales.reduce((a,l)=>a+(l.comm_paid_at?0:+l.comm_amount||0)+(l.mgr_id&&!l.mgr_paid_at?+l.mgr_amount||0:0),0), unpaid=sold.length-paidSales.length, pl=(n,one,many)=>n===1?one:many;
+  const HERO={
+    over:[A.leads.length,pl(A.leads.length,'lead in the system','leads in the system'),'Overview',free?`${free.toLocaleString()} not assigned yet`:'Every lead is assigned',`<b>${(open.length-free).toLocaleString()}</b> with callers and <b>${done.length.toLocaleString()}</b> completed.`],
+    crm:[due,pl(due,'follow-up due','follow-ups due'),'CRM',due?'Calls to chase today':'Nothing overdue',`<b>${A.leads.length.toLocaleString()}</b> contacts in the pipeline.`],
+    people:[pending.length,pl(pending.length,'application waiting','applications waiting'),'People',pending.length?'Waiting for your decision':'Nobody is waiting',`<b>${accepted.length}</b> cold ${pl(accepted.length,'caller','callers')} and <b>${managers.length}</b> ${pl(managers.length,'manager','managers')} accepted.`],
+    leads:[free,pl(free,'lead unassigned','leads unassigned'),'Leads',free?'Ready to hand out':'All handed out',`<b>${(open.length-free).toLocaleString()}</b> with callers, <b>${done.length.toLocaleString()}</b> completed, <b>${A.leads.length.toLocaleString()}</b> in total.`],
+    meets:[waiting.length,pl(waiting.length,'Meet waiting for a result','Meets waiting for a result'),'Meets and sales',waiting.length?'Mark each one after the Meet':'Nothing waiting on you',`<b>${unpaid}</b> ${pl(unpaid,'sale is','sales are')} sold and awaiting payment; <b>${paidSales.length}</b> paid.`],
+    done:[done.length,pl(done.length,'lead completed','leads completed'),'Completed',`${booked.toLocaleString()} booked a Meet`,`Everything your callers have checked off, newest first.`],
+    rules:[A.ranks.length,pl(A.ranks.length,'rank','ranks'),'Pay rules','What everyone earns',`Managers earn <b>${+A.mgrRate}%</b> of their team's sales unless you set their own cut.`],
+    pay:[owedAll,'owed to your team','Payouts',owedAll?'Pay these when you are ready':'Nobody is owed anything',`Commission becomes payable once the customer has paid.`,{money:true}],
+    ann:[(A.anns||[]).length,pl((A.anns||[]).length,'announcement live','announcements live'),'Announcements','What your team sees at the top',`Shown to the people you choose until you remove it.`]}[A.tab];
+  let h=(HERO?hero(HERO[0],HERO[1],HERO[2],HERO[3],`<p class="hsub">${HERO[4]}</p>`,HERO[5]||{}):'')+
+  (A.tab==='over'||A.tab==='leads'?`<dl class="sum"><div><dt>Leads</dt><dd>${A.leads.length.toLocaleString()}</dd></div><div><dt>Unassigned</dt><dd>${free.toLocaleString()}</dd></div><div><dt>With callers</dt><dd>${(open.length-free).toLocaleString()}</dd></div><div><dt>Completed</dt><dd>${done.length.toLocaleString()}</dd></div></dl>`:'')+
+  `<p class="note ${A.note[1]}" id="note" role="status">${esc(A.note[0])}</p>`;
   if(A.tab==='crm'){h+=crmHTML(nameOf)}
   else if(A.tab==='ann'){
     const aud={all:'Everyone',callers:'Cold callers only',managers:'Managers only'};
@@ -1118,7 +1139,7 @@ function drawAdmin(){
       <div class="wrap"><table><thead><tr><th></th><th>Phone</th><th>Business</th><th>Town</th><th>Type</th><th class="num">Rating</th><th class="num">Reviews</th><th>Tier</th><th>Held by</th></tr></thead><tbody>${open.map(l=>
       `<tr data-h="${esc(l.assigned_to||'free')}" data-t="${esc(l.tier)}" data-r="${esc(l.region)}"><td><input type="checkbox" value="${l.id}" aria-label="Select ${esc(l.business_name)}"></td>${leadCells(l)}<td>${l.assigned_to?esc(nameOf[l.assigned_to]||'caller'):'<span class="mute">–</span>'}</td></tr>`).join('')}</tbody></table></div>`;
   }
-  view.innerHTML=h;
+  view.innerHTML=h; countUp(view,A.heroTab===A.tab); A.heroTab=A.tab;   // count up when a section opens, not on every live refresh
   if(A.tab==='crm')crmWire();
   document.querySelectorAll('#nav [data-tab]').forEach(b=>b.onclick=()=>{const kb=b.matches(':focus-visible');A.tab=b.dataset.tab;A.note=['',''];drawAdmin();scrollTo(0,0);const t=document.getElementById('tab-'+A.tab);if(kb&&t)t.focus()});
   const rd=document.getElementById('rej'); if(rd)rd.ontoggle=()=>{A.rejOpen=rd.open};
