@@ -20,6 +20,40 @@ main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}
 h2{font-size:18px;font-weight:650;letter-spacing:-.01em;margin:0}
 p{margin:0 0 12px}.mute{color:var(--mute)}.small{font-size:13px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;max-width:420px;margin:6vh auto 0}.card h2{margin-bottom:6px}
+.ob{max-width:540px;margin:7vh auto 0}.ob-top{display:flex;align-items:center;gap:12px;margin-bottom:40px}
+.ob-back{width:32px;height:32px;padding:0;display:grid;place-content:center;border-radius:8px;flex:none}
+.ob-prog{flex:1;height:4px;border-radius:2px;background:var(--panel);overflow:hidden}.ob-prog i{display:block;height:100%;width:0;background:var(--accent);border-radius:2px;transition:width .5s cubic-bezier(.16,1,.3,1)}
+.ob-count{font-family:var(--mono);font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums;min-width:38px;text-align:right}
+.ob-step{animation:obin .42s cubic-bezier(.16,1,.3,1) both}@keyframes obin{from{opacity:0;transform:translateX(calc(var(--d)*32px));filter:blur(3px)}}
+.ob-q{font-size:clamp(28px,6vw,40px);line-height:1.12;letter-spacing:-.025em;font-weight:680;margin:0 0 10px;text-wrap:balance}.ob-sub{color:var(--mute);font-size:15px;margin:0;max-width:44ch}
+.ob-in,.ob-ta{margin-top:28px;height:56px;font-size:19px;padding:0 16px;border-radius:12px;caret-color:var(--accent)}.ob-ta{height:auto;min-height:124px;padding:14px 16px;font-size:17px;line-height:1.45}.ob-ta.sm{margin-top:0;min-height:84px;font-size:15px}
+.ob-lab{margin-top:22px}.ob ::selection{background:var(--accent);color:var(--accent-ink)}
+.ob-go{display:flex;align-items:center;gap:16px;margin-top:28px}.ob-go .pri{height:48px;padding:0 24px;font-size:15px;border-radius:12px}.ob-hint{font-size:13px;color:var(--mute)}
+.ob #msg{margin:16px 0 0}
+.ob-age{display:flex;align-items:center;gap:14px;margin-top:28px}.ob-pm{width:48px;height:48px;padding:0;border-radius:50%;display:grid;place-content:center;flex:none;transition:transform .2s cubic-bezier(.16,1,.3,1)}.ob-pm:active{transform:scale(.92)}
+.ob-num{width:132px;height:88px;font-size:56px;font-weight:680;letter-spacing:-.03em;text-align:center;border-radius:16px;padding:0;font-variant-numeric:tabular-nums;caret-color:var(--accent)}
+.ob-minor{margin-top:22px;padding:16px;border-radius:12px;background:var(--warmbg);color:var(--warm);font-size:14px;animation:obin .4s cubic-bezier(.16,1,.3,1) both;--d:0}.ob-minor p{margin:0 0 12px}.ob-minor label{margin:12px 0 0;color:inherit;font-weight:500;font-size:14px}
+.ob-opts{display:grid;gap:10px;margin-top:28px}
+.ob-opt{height:64px;padding:0 20px;border-radius:14px;display:flex;align-items:center;justify-content:space-between;font-size:17px;font-weight:600;text-align:left;animation:obup .5s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--n)*55ms);transition:transform .2s cubic-bezier(.16,1,.3,1),background .2s,border-color .2s,color .2s}
+.ob-opt:hover:not(:disabled){transform:translateX(4px);border-color:var(--accent);background:var(--surface)}.ob-opt[aria-checked=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ob-pips{display:flex;gap:4px;align-items:flex-end;height:20px}.ob-pips i{width:6px;border-radius:2px;background:var(--line);height:8px}.ob-pips i:nth-child(2){height:14px}.ob-pips i:nth-child(3){height:20px}.ob-pips i.on{background:var(--accent)}.ob-opt[aria-checked=true] .ob-pips i{background:var(--accent-ink);opacity:.35}.ob-opt[aria-checked=true] .ob-pips i.on{opacity:1}
+@keyframes obup{from{opacity:0;transform:translateY(14px)}}
+.ob-bub{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:center;margin-top:36px}
+.ob-b{width:var(--s);height:var(--s);padding:0;border-radius:50%;display:grid;place-content:center;text-align:center;line-height:1.05;animation:obpop .6s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--n)*70ms);transition:transform .25s cubic-bezier(.16,1,.3,1),background .2s,border-color .2s,color .2s}
+.ob-b b{font-size:calc(var(--s)*.21);font-weight:680;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.ob-b small{display:block;font-size:11px;font-weight:500;color:var(--mute);margin-top:3px}
+.ob-b:hover:not(:disabled){transform:translateY(-5px);border-color:var(--accent);background:var(--surface)}.ob-b[aria-checked=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);transform:scale(1.06)}.ob-b[aria-checked=true] small{color:inherit;opacity:.8}
+@keyframes obpop{from{opacity:0;transform:scale(.6)}}
+.ob-days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:208px;margin-top:32px}
+.ob-day{height:100%;padding:0;border:0;background:none;display:flex;flex-direction:column;gap:10px;border-radius:12px}.ob-day:hover:not(:disabled){background:none}
+.ob-day .col{flex:1;position:relative;border-radius:12px;background:var(--panel);overflow:hidden;transform-origin:bottom;animation:obrise .6s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--n)*45ms)}
+.ob-day .col i{position:absolute;left:0;right:0;bottom:0;height:10%;background:var(--line);transition:height .5s cubic-bezier(.16,1,.3,1),background .25s}
+.ob-day:hover .col i{height:22%}.ob-day[aria-pressed=true] .col i{height:100%;background:var(--accent)}
+.ob-day .lab{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);transition:color .2s}.ob-day[aria-pressed=true] .lab{color:var(--ink);font-weight:600}
+@keyframes obrise{from{transform:scaleY(.15);opacity:0}}
+.ob-quick{display:flex;align-items:center;gap:18px;margin-top:18px;font-size:14px}.ob-quick span{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+.ob :focus-visible{outline:2px solid var(--ring);outline-offset:3px}
+@media (max-width:480px){.ob{margin-top:2vh}.ob-top{margin-bottom:28px}.ob-days{gap:5px;height:176px}.ob-bub{gap:10px}.ob-b{width:calc(var(--s)*.8);height:calc(var(--s)*.8)}.ob-hint{display:none}}
+@media (prefers-reduced-motion:reduce){.ob-step,.ob-opt,.ob-b,.ob-day .col,.ob-minor{animation:none}.ob-prog i,.ob-day .col i,.ob-opt,.ob-b,.ob-pm{transition:none}}
 .sso{display:grid;gap:10px;margin-top:18px}.sso #gbtn{color-scheme:light;height:40px;overflow:hidden;border-radius:4px}
 .ssob{height:40px;width:100%;border-radius:4px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
 .ssob.mail{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
@@ -502,30 +536,86 @@ function showNewPassword(){
 }
 /* The three application answers, shown under an applicant's note. Empty for people who applied before they were asked. */
 const appInfo=c=>(c.age&&+c.age<18?'<div class="reg" style="color:var(--warm);font-weight:600">Under 18: get the signed parent consent form before you accept</div>':'')+[c.age?'Age '+(+c.age):'',c.sales_experience?'Sales: '+c.sales_experience:'',c.availability?'Available: '+c.availability:''].filter(Boolean).map(t=>`<div class="reg">${esc(t)}</div>`).join('');
+/*
+ * The application, one question to a screen. Answers are kept in S while the person moves back and forth, and are
+ * sent in one go at the end through apply_as_caller3, in the same wording the reviewers already see.
+ * The "what did you sell" screen only appears for someone who says they have sold before.
+ */
 async function showApply(){
   let team=null; if(teamCode){const r=await sb.rpc('team_name',{p_code:teamCode}); team=r.error?null:r.data}
-  view.innerHTML=`<div class="card"><h2>Apply as a cold caller</h2><p class="mute small">${team?`You are applying to join <b>${esc(team)}</b>'s team. They review your application.`:'An admin reviews every application.'} Once accepted, the leads assigned to you appear here.</p>
-  <form id="f"><label for="nm">Full name</label><input id="nm" autocomplete="name" required minlength="2" maxlength="120">
-  <label for="ag">Age</label><input id="ag" type="number" inputmode="numeric" required min="16" max="100" step="1">
-  <div id="minor" hidden style="margin-top:10px"><p class="note" style="color:var(--warm);background:var(--warmbg)">Because you are under 18, a parent or guardian has to sign a consent form. You cannot be accepted until you have handed it in.</p>
-  <div class="row"><button type="button" id="conopen">Open the consent form to print</button></div>
-  <label style="margin-top:10px;font-weight:400;color:var(--ink)"><input type="checkbox" id="conok"> I will get the form signed by a parent or guardian and hand it in</label></div>
-  <label for="ph">Phone (optional)</label><input id="ph" type="tel" autocomplete="tel" maxlength="40">
-  <label for="sx">Sales experience</label><select id="sx" required><option value="">Choose one</option><option>No sales experience</option><option>Under 1 year</option><option>1 to 3 years</option><option>More than 3 years</option></select>
-  <label for="sd">What have you sold, and how? (optional)</label><textarea id="sd" maxlength="500" placeholder="Cold calling, door to door, retail, online…"></textarea>
-  <label for="hr">Availability: hours a week</label><select id="hr" required><option value="">Choose one</option><option>Under 10 hours a week</option><option>10 to 20 hours a week</option><option>20 to 30 hours a week</option><option>More than 30 hours a week</option></select>
-  <fieldset id="wn" style="border:0;padding:0;margin:14px 0 0"><legend style="font-size:13px;font-weight:500;color:var(--mute);padding:0;margin-bottom:6px">When can you call? Pick all that fit</legend><div class="row">${['Weekday mornings','Weekday afternoons','Weekday evenings','Weekends'].map(w=>`<label style="margin:0;font-weight:400;color:var(--ink)"><input type="checkbox" value="${w}"> ${w}</label>`).join('')}</div></fieldset>
-  <label for="nt">Anything the admin should know (optional)</label><textarea id="nt" maxlength="1000"></textarea>
-  <div class="row top"><button class="pri">Send application</button></div><p id="msg"></p></form></div>`;
-  const minor=()=>{const a=parseInt($('#ag').value,10);return a>=16&&a<18};
-  $('#ag').oninput=()=>{$('#minor').hidden=!minor();$('#conok').required=minor()}; $('#conopen').onclick=printConsent;
-  $('#f').onsubmit=async e=>{e.preventDefault();
-    if(!(parseInt($('#ag').value,10)>=16))return say($('#msg'),'You must be at least 16 to apply.','bad');
-    const whenOk=[...document.querySelectorAll('#wn input:checked')].map(x=>x.value), sd=$('#sd').value.trim();
-    if(!whenOk.length)return say($('#msg'),'Pick at least one time you can call.','bad');
-    const {error}=await sb.rpc('apply_as_caller3',{p_name:$('#nm').value,p_phone:$('#ph').value,p_note:$('#nt').value,p_code:team?teamCode:null,
-      p_experience:$('#sx').value+(sd?': '+sd:''),p_availability:$('#hr').value+'; '+whenOk.join(', ').toLowerCase(),p_age:parseInt($('#ag').value,10)});
-    if(error)return say($('#msg'),error.message,'bad'); try{localStorage.removeItem('teamCode')}catch(e){} route()};
+  const EXP=[['No sales experience','Not yet'],['Under 1 year','Under a year'],['1 to 3 years','1 to 3 years'],['More than 3 years','More than 3 years']];
+  const HRS=[['Under 10 hours a week','<10',88],['10 to 20 hours a week','10–20',108],['20 to 30 hours a week','20–30',128],['More than 30 hours a week','30+',148]];
+  const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const S={i:0,dir:1,name:'',age:'',consent:false,exp:'',sold:'',hours:'',days:new Set(),phone:'',note:'',busy:false};
+  const order=()=>['name','age','exp',...(S.exp&&S.exp!==EXP[0][0]?['sold']:[]),'hours','days','last'];
+  const first=()=>esc((S.name.trim().split(/\s+/)[0]||'').slice(0,24));
+  const minor=()=>{const a=parseInt(S.age,10);return a>=16&&a<18};
+  const go=`<div class="ob-go"><button class="pri" type="submit">Continue</button><span class="ob-hint">or press Enter</span></div>`;
+  view.innerHTML=`<div class="ob"><div class="ob-top"><button type="button" class="ob-back" id="obback" aria-label="Back"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="ob-prog" id="obprog" role="progressbar" aria-label="Application progress" aria-valuemin="1"><i id="obbar"></i></div><span class="ob-count" id="obcount"></span></div><div id="obstage"></div></div>`;
+  const VIEW={
+    name:()=>`<h2 class="ob-q">What's your name?</h2><p class="ob-sub">${team?`You are applying to join <b>${esc(team)}</b>'s team. They review your application.`:'An admin reviews every application.'}</p>
+      <input class="ob-in" id="obname" data-auto autocomplete="name" maxlength="120" placeholder="First and last name" aria-label="Your full name" value="${esc(S.name)}">${go}`,
+    age:()=>`<h2 class="ob-q">How old are you${first()?', '+first():''}?</h2><p class="ob-sub">You have to be at least 16.</p>
+      <div class="ob-age"><button type="button" class="ob-pm" data-pm="-1" aria-label="One year younger"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8h10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button>
+      <input class="ob-num" id="obage" data-auto inputmode="numeric" maxlength="3" aria-label="Your age" value="${esc(S.age)}" placeholder="–">
+      <button type="button" class="ob-pm" data-pm="1" aria-label="One year older"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button></div>
+      <div class="ob-minor" id="obminor" ${minor()?'':'hidden'}><p>Because you are under 18, a parent or guardian has to sign a consent form. You cannot be accepted until you have handed it in.</p>
+      <button type="button" id="conopen">Open the consent form to print</button>
+      <label><input type="checkbox" id="conok" ${S.consent?'checked':''}> I will get the form signed by a parent or guardian and hand it in</label></div>${go}`,
+    exp:()=>`<h2 class="ob-q">Have you done sales before?</h2><p class="ob-sub">Either answer is fine.</p>
+      <div class="ob-opts" role="radiogroup" aria-label="Sales experience">${EXP.map(([v,l],n)=>`<button type="button" class="ob-opt" role="radio" aria-checked="${S.exp===v}" data-v="${v}" style="--n:${n}"><span>${l}</span><span class="ob-pips" aria-hidden="true">${[1,2,3].map(k=>`<i class="${k<=n?'on':''}"></i>`).join('')}</span></button>`).join('')}</div>`,
+    sold:()=>`<h2 class="ob-q">What did you sell, and how?</h2><p class="ob-sub">A line or two is plenty. You can skip this.</p>
+      <textarea class="ob-ta" id="obsold" data-auto maxlength="500" placeholder="Cold calling, door to door, retail, online…" aria-label="What you sold and how">${esc(S.sold)}</textarea>
+      <div class="ob-go"><button class="pri" type="submit">Continue</button><button type="button" class="link" id="obskip">Skip</button></div>`,
+    hours:()=>`<h2 class="ob-q">How many hours a week can you call?</h2><p class="ob-sub">A rough number. You choose your own hours.</p>
+      <div class="ob-bub" role="radiogroup" aria-label="Hours a week">${HRS.map(([v,l,sz],n)=>`<button type="button" class="ob-b" role="radio" aria-checked="${S.hours===v}" data-v="${v}" aria-label="${v}" style="--s:${sz}px;--n:${n}"><b>${l}</b><small>hours</small></button>`).join('')}</div>`,
+    days:()=>`<h2 class="ob-q">Which days can you call?</h2><p class="ob-sub">Tap every day that works. The time of day does not matter.</p>
+      <div class="ob-days" role="group" aria-label="Days you can call">${DAYS.map((d,n)=>`<button type="button" class="ob-day" aria-pressed="${S.days.has(d)}" data-d="${d}" style="--n:${n}"><span class="col"><i></i></span><span class="lab">${d}</span></button>`).join('')}</div>
+      <div class="ob-quick"><button type="button" class="link" data-pick="5">Weekdays</button><button type="button" class="link" data-pick="7">Every day</button><span id="obdc" aria-live="polite"></span></div>${go}`,
+    last:()=>`<h2 class="ob-q">Last one. What's your number?</h2><p class="ob-sub">Optional.</p>
+      <input class="ob-in" id="obphone" data-auto type="tel" autocomplete="tel" maxlength="40" placeholder="Phone number" aria-label="Phone number, optional" value="${esc(S.phone)}">
+      <label for="obnote" class="ob-lab">Anything we should know? Optional</label><textarea class="ob-ta sm" id="obnote" maxlength="1000">${esc(S.note)}</textarea>
+      <div class="ob-go"><button class="pri" type="submit" id="obsend">Send application</button></div>`};
+  const pick=(sel,key)=>document.querySelectorAll(sel).forEach(b=>b.onclick=()=>{if(S.busy)return;S[key]=b.dataset.v;document.querySelectorAll(sel).forEach(x=>x.setAttribute('aria-checked',x===b));S.busy=true;setTimeout(()=>{S.busy=false;next()},260)});
+  const BIND={
+    name:()=>{$('#obname').oninput=e=>S.name=e.target.value},
+    age:()=>{const a=$('#obage'),sync=()=>{S.age=a.value=a.value.replace(/\D/g,'');$('#obminor').hidden=!minor();say($('#msg'),'')};
+      a.oninput=sync; document.querySelectorAll('.ob-pm').forEach(b=>b.onclick=()=>{a.value=String(Math.min(100,Math.max(16,(parseInt(a.value,10)||(b.dataset.pm>0?17:19))+ +b.dataset.pm)));sync()});
+      $('#conopen').onclick=printConsent; $('#conok').onchange=e=>S.consent=e.target.checked},
+    exp:()=>pick('.ob-opt','exp'),
+    sold:()=>{$('#obsold').oninput=e=>S.sold=e.target.value;$('#obskip').onclick=()=>{S.sold='';$('#obsold').value='';next()}},
+    hours:()=>pick('.ob-b','hours'),
+    days:()=>{const cnt=()=>{const n=S.days.size;$('#obdc').textContent=n?`${n} day${n>1?'s':''} a week`:''};cnt();
+      const set=(b,on)=>{on?S.days.add(b.dataset.d):S.days.delete(b.dataset.d);b.setAttribute('aria-pressed',on)};
+      document.querySelectorAll('.ob-day').forEach(b=>b.onclick=()=>{set(b,!S.days.has(b.dataset.d));cnt();say($('#msg'),'')});
+      document.querySelectorAll('[data-pick]').forEach(q=>q.onclick=()=>{document.querySelectorAll('.ob-day').forEach((b,n)=>set(b,n<+q.dataset.pick));cnt();say($('#msg'),'')})},
+    last:()=>{$('#obphone').oninput=e=>S.phone=e.target.value;$('#obnote').oninput=e=>S.note=e.target.value}};
+  const CHECK={
+    name:()=>S.name.trim().length<2&&'Type your first and last name.',
+    age:()=>{const a=parseInt(S.age,10);return !a?'Type your age.':a<16?'You must be at least 16 to apply.':a>100?'Check your age.':minor()&&!S.consent&&'Tick the box about the consent form to carry on.'},
+    exp:()=>!S.exp&&'Pick the one that fits.', sold:()=>false, hours:()=>!S.hours&&'Pick the one that fits.',
+    days:()=>!S.days.size&&'Tap at least one day.', last:()=>false};
+  function draw(){
+    const o=order(); S.i=Math.min(S.i,o.length-1); const id=o[S.i];
+    $('#obbar').style.width=(S.i+1)/o.length*100+'%'; $('#obprog').setAttribute('aria-valuemax',o.length); $('#obprog').setAttribute('aria-valuenow',S.i+1);
+    $('#obcount').textContent=`${S.i+1} / ${o.length}`; $('#obback').style.visibility=S.i?'visible':'hidden';
+    $('#obstage').innerHTML=`<form class="ob-step" id="obf" novalidate style="--d:${S.dir}">${VIEW[id]()}<p id="msg" role="alert"></p></form>`;
+    BIND[id](); $('#obf').onsubmit=e=>{e.preventDefault();next()};
+    const a=$('#obf').querySelector('[data-auto]'); if(a){a.focus({preventScroll:true}); if(a.setSelectionRange&&a.type!=='number')try{a.setSelectionRange(a.value.length,a.value.length)}catch(e){}}
+  }
+  async function next(){
+    const o=order(), id=o[S.i], bad=CHECK[id](); if(bad)return say($('#msg'),bad,'bad');
+    if(id!=='last'){S.i++;S.dir=1;return draw()}
+    if(S.busy)return; S.busy=true; const b=$('#obsend'); b.disabled=true; b.textContent='Sending…';
+    const {error}=await sb.rpc('apply_as_caller3',{p_name:S.name,p_phone:S.phone,p_note:S.note,p_code:team?teamCode:null,
+      p_experience:S.exp+(S.exp!==EXP[0][0]&&S.sold.trim()?': '+S.sold.trim():''),
+      p_availability:S.hours+'; '+DAYS.filter(d=>S.days.has(d)).join(', '),p_age:parseInt(S.age,10)});
+    S.busy=false; if(error){b.disabled=false;b.textContent='Send application';return say($('#msg'),error.message,'bad')}
+    try{localStorage.removeItem('teamCode')}catch(e){} route();
+  }
+  $('#obback').onclick=()=>{if(S.i&&!S.busy){S.i--;S.dir=-1;draw()}};
+  draw();
 }
 
 const GUIDE=`<details class="guide" id="guide"><summary>Your job and the call script</summary><div class="gb">
