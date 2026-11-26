@@ -20,6 +20,10 @@ main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}
 h2{font-size:18px;font-weight:650;letter-spacing:-.01em;margin:0}
 p{margin:0 0 12px}.mute{color:var(--mute)}.small{font-size:13px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;max-width:420px;margin:6vh auto 0}.card h2{margin-bottom:6px}
+.sso{display:grid;gap:10px;margin-top:18px}.sso #gbtn{color-scheme:light;height:40px;overflow:hidden;border-radius:4px}
+.ssob{height:40px;width:100%;border-radius:4px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+.ssob.mail{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.ssoor{display:flex;align-items:center;gap:12px;color:var(--mute);font-size:12px}.ssoor::before,.ssoor::after{content:"";flex:1;border-top:1px solid var(--line)}
 label{display:block;font-size:13px;font-weight:500;color:var(--mute);margin:14px 0 4px}
 input,select,textarea{font:inherit;width:100%;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 input::placeholder,textarea::placeholder{color:var(--mute);opacity:1}
@@ -428,16 +432,51 @@ async function route(){
 }
 function showInfo(t,b){view.innerHTML=`<div class="card"><h2>${esc(t)}</h2><p class="mute">${esc(b)}</p><button id="again">Check again</button></div>`;$('#again').onclick=route}
 
+/*
+ * "Sign in with Google", using Google's own button on this page. The browser never passes through the backend's
+ * address, so Google's window names this site and not the backend. Google hands back a signed token and the backend
+ * checks it. The nonce ties that token to this page load: Google gets the hashed value, the backend gets the raw one.
+ * If Google's script is blocked or slow, the email and password form simply stays as it is.
+ */
+const GOOGLE_CLIENT='878426683580-lspe2cj2vg6d2d04nto62bunj2hs8jq5.apps.googleusercontent.com';
+let gsiLoad=null;
+function loadGsi(){return gsiLoad||(gsiLoad=new Promise((ok,no)=>{const t=document.createElement('script');t.src='https://accounts.google.com/gsi/client';t.async=true;t.onload=ok;t.onerror=()=>{gsiLoad=null;no()};document.head.appendChild(t)}))}
+async function nonces(){const raw=btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32))));
+  return {raw,hashed:Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw))),b=>b.toString(16).padStart(2,'0')).join('')}}
+const ssoFail=(msg,who)=>say(msg,`${who} sign-in did not finish. Try again, or use your email and password.`,'bad');
+async function ssoButtons(msg,up){
+  const shown=()=>{const o=document.getElementById('ssoor');if(o)o.hidden=!document.getElementById('f').hidden};
+  googleButton(msg,up).then(ok=>{if(ok)shown()});
+}
+async function googleButton(msg,up){
+  try{
+    await loadGsi(); const el=document.getElementById('gbtn'); if(!el||!window.google||!google.accounts)return false;
+    const n=await nonces(); if(!document.body.contains(el))return false;
+    google.accounts.id.initialize({client_id:GOOGLE_CLIENT,nonce:n.hashed,use_fedcm_for_prompt:true,callback:async r=>{
+      say(msg,'Working…');
+      const {error}=await sb.auth.signInWithIdToken({provider:'google',token:r.credential,nonce:n.raw});
+      if(error)ssoFail(msg,'Google')}});
+    el.hidden=false;
+    google.accounts.id.renderButton(el,{type:'standard',theme:'outline',size:'large',text:up?'signup_with':'signin_with',shape:'rectangular',logo_alignment:'center',width:Math.min(400,Math.max(200,Math.floor(el.parentElement.clientWidth)))});
+    return true;
+  }catch(e){return false /* no Google button; email still works */}
+}
 function showAuth(mode='in'){
   const up=mode==='up';
+  const word=up?'Sign up':'Sign in';
   view.innerHTML=`<div class="card"><h2>${up?'Create an account':'Sign in'}</h2>
-  <p class="mute small">${up?'Use your own email and choose a password. Then you can apply as a cold caller.':'Cold callers and admins sign in here.'}</p>
-  <form id="f"><label for="em">Email</label><input id="em" type="email" autocomplete="email" required>
+  <p class="mute small">${up?'Then you can apply as a cold caller.':'Cold callers and admins sign in here.'}</p>
+  <div class="sso"><div id="gbtn" hidden></div>
+  <div class="ssoor" id="ssoor" hidden><span>or</span></div>
+  <button type="button" class="ssob mail" id="ebtn">${word} with email</button></div>
+  <form id="f" hidden><label for="em">Email</label><input id="em" type="email" autocomplete="email" required>
   <label for="pw">Password</label><input id="pw" type="password" autocomplete="${up?'new-password':'current-password'}" minlength="8" required>
   <div class="row top"><button class="pri" type="submit">${up?'Create account':'Sign in'}</button>
-  <button class="link" type="button" id="swap">${up?'I already have an account':'Create an account'}</button>
-  ${up?'':'<button class="link" type="button" id="forgot">Forgot password</button>'}</div><p id="msg"></p></form></div>`;
-  const msg=$('#msg');
+  ${up?'':'<button class="link" type="button" id="forgot">Forgot password</button>'}</div></form>
+  <p id="msg" style="margin-top:12px"></p>
+  <p class="mute small" style="margin:16px 0 0">${up?'Already have an account?':'New here?'} <button class="link" type="button" id="swap">${up?'Sign in':'Create an account'}</button></p></div>`;
+  const msg=$('#msg'); ssoButtons(msg,up);
+  $('#ebtn').onclick=()=>{$('#ebtn').hidden=true;$('#ssoor').hidden=true;$('#f').hidden=false;$('#em').focus()};
   $('#swap').onclick=()=>showAuth(up?'in':'up');
   if(!up)$('#forgot').onclick=async()=>{
     const email=$('#em').value.trim(); if(!email)return say(msg,'Enter your email first.','bad');
