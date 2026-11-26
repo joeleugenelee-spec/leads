@@ -122,7 +122,7 @@ td select{height:32px;font-size:13px;width:auto;max-width:180px}td input[type=nu
 #top .in{flex-wrap:wrap}.rank{grid-template-columns:1fr}.sum.s3{grid-template-columns:1fr}.sum.s3 div{border-left:0;border-top:1px solid var(--line)}.sum.s3 div:first-child{border-top:0}.acct{gap:8px}#who{display:none}.rolebadge i{display:none}.mine td.act .bkf{width:100%}.mine td.act .bkf button{flex:none}
 #nav{scrollbar-width:none}#nav::-webkit-scrollbar{display:none}.bar.sel select{flex:1 1 100%}.bar.sel #give,.bar.sel #take{flex:1;height:40px}}
 #top.two .in{flex-wrap:wrap}#top.two #nav{order:3;flex:1 1 100%;overflow-x:auto;scrollbar-width:none}#top.two #nav::-webkit-scrollbar{display:none}#top.two #nav button{min-height:44px}@media(max-width:560px){#top.two #vas{max-width:110px!important}}#top.two #tab-leads{margin-left:8px;padding-left:20px;border-left:1px solid var(--line)}
-.docs ul{margin:0 0 8px;padding-left:20px}.docs a{color:var(--link);text-decoration:underline;text-underline-offset:3px}.docs li{margin:0 0 6px}.docs a,.docs .gb{overflow-wrap:anywhere}.fill{background:var(--warmbg);color:var(--warm);padding:1px 5px;border-radius:4px;font-size:.93em}.warn2{max-width:68ch;padding:10px 12px;border-radius:8px;background:var(--warmbg);color:var(--warm);font-size:14px;margin:0 0 16px}#docv .pagehead{max-width:calc(68ch + 34px)}#foot{padding:24px 0 0;font-size:13px}
+.docs ul{margin:0 0 8px;padding-left:20px}.docs a{color:var(--link);text-decoration:underline;text-underline-offset:3px}.docs li{margin:0 0 6px;display:list-item;padding:0;border:0}.docs a,.docs .gb{overflow-wrap:anywhere}.fill{background:var(--warmbg);color:var(--warm);padding:1px 5px;border-radius:4px;font-size:.93em}.warn2{max-width:68ch;padding:10px 12px;border-radius:8px;background:var(--warmbg);color:var(--warm);font-size:14px;margin:0 0 16px}#docv .pagehead{max-width:calc(68ch + 34px)}#foot{padding:24px 0 0;font-size:13px}
 .pipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px}.pipe button{height:auto;padding:10px 12px;text-align:left;display:block;font-size:13px;color:var(--mute);font-weight:500;white-space:normal}.pipe b{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}.pipe button[aria-pressed=true]{border-color:var(--accent);color:var(--ink);background:var(--panel)}.crmd{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 4px}.crmd h3{font-size:12px;font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);margin:20px 0 8px}.crmd .goal{font-size:17px;font-weight:600;margin:0;max-width:70ch}.crmd ul,.crmd ol{margin:0;padding-left:20px;max-width:70ch}.crmd li{margin:0 0 6px}.crmd textarea{width:100%;max-width:70ch}.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px 20px;margin:0}.kv dt{font-size:12px;color:var(--mute);margin:0 0 2px}.kv dd{margin:0;font-weight:500;overflow-wrap:anywhere}.tl{list-style:none!important;padding:0!important}.tl li{display:grid;grid-template-columns:170px 1fr;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:14px;margin:0}.tl li:first-child{border-top:0}@media(max-width:560px){.tl li{grid-template-columns:1fr;gap:2px}}
 .bkf textarea{width:100%}.ni .held{font-weight:600}
 /* ---- Navigation: a boxed menu down the left on wide screens; a bottom bar with a More sheet on phones ---- */
@@ -262,6 +262,28 @@ async function viewAs(v){
   return kind==='manager'?showManager():showCaller();
 }
 new MutationObserver(()=>{if(VA)view.querySelectorAll('button:not(:disabled)').forEach(b=>{b.disabled=true;b.title='Read-only while viewing as someone else'})}).observe(view,{childList:true,subtree:true});
+/* Parent or guardian consent for applicants aged 16 or 17. Shown in the documents section and printable by itself. */
+const CONSENT=`<h3>Parent or guardian consent form</h3>
+<p>For a cold caller aged 16 or 17 at Moonshot Sites ("the business"). Nobody under 16 can apply. An applicant aged 16 or 17 cannot be accepted until this form is signed and handed in.</p>
+<p><b>Applicant's full name:</b> ______________________________ &nbsp; <b>Date of birth:</b> ______________</p>
+<h3>What the work is</h3>
+<ul><li>The applicant phones local businesses from a list the business provides and books 15-minute demo meetings with the manager. They do not sell, quote prices or take payment.</li>
+<li>They work from wherever they choose, on their own phone, at times they choose. This work must not be done during school hours.</li>
+<li>Pay is commission only. They earn a percentage of each sale that comes from a meeting they booked, once the customer has paid. Calls and bookings that do not become a paid sale earn nothing.</li>
+<li>They are an independent contractor, not an employee. No wages, benefits or expenses are paid and no tax is taken out, so they are responsible for reporting what they earn. They may need your help with that.</li>
+<li>The lead lists, call script and customer details they see are confidential and must not be copied or shared.</li></ul>
+<h3>Your consent</h3>
+<p>By signing, I confirm that:</p>
+<ul><li>I am the parent or legal guardian of the applicant named above.</li>
+<li>I have read the independent contractor agreement and the terms of use for this work, and I understand the description above.</li>
+<li>I consent to the applicant doing this work, and I sign the independent contractor agreement together with them.</li>
+<li>I consent to the business keeping the applicant's name, contact details and age for this work.</li>
+<li>I will tell the business how the applicant should be paid if they have no account in their own name.</li>
+<li>I can withdraw this consent at any time by telling the business in writing. Commission already earned is still paid.</li></ul>
+<p>Parent or guardian's full name: ______________________________<br>Relationship to the applicant: ______________________________<br>Phone or email: ______________________________<br>Signature: ______________________________ Date: __________</p>
+<p>Applicant's signature: ______________________________ Date: __________</p>
+<p class="mute">Handing it in: give the signed form to the person reviewing the application (the manager whose link was used, or the admin). A clear photo or scan is fine.</p>`;
+function printConsent(){const w=window.open('','_blank');if(!w)return;w.document.write('<!doctype html><meta charset="utf-8"><title>Parent or guardian consent form · Moonshot Sites</title><style>body{font:15px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;color:#17141f;max-width:720px;margin:32px auto;padding:0 24px}h3{margin:22px 0 6px}h3:first-child{font-size:22px}li{margin:0 0 6px}p{margin:0 0 12px}.mute{color:#5e5870}</style>'+CONSENT);w.document.close();w.focus();w.print()}
 const DOCS=`<div class="pagehead"><h2>Legal and tax documents</h2><button id="docback">Back</button></div>
 <p class="warn2"><b>Drafts.</b> These are plain-language templates, not legal or tax advice. Nothing here is in effect until the business has completed the highlighted blanks, had a lawyer or accountant review it, and you have both signed where a signature is needed.</p>
 <details class="guide docs" open><summary>Tax forms: what you need to hand in</summary><div class="gb">
@@ -323,8 +345,11 @@ const DOCS=`<div class="pagehead"><h2>Legal and tax documents</h2><button id="do
 <li>Record call outcomes and bookings truthfully.</li>
 <li>The figures shown are the business's records. If you think one is wrong, say so promptly. Pay is governed by your signed contractor agreement.</li>
 <li>The site is provided as it is and may change or be unavailable at times.</li></ul>
-</div></details>`;
-function showDocs(){const d=$('#docv');d.innerHTML=DOCS;d.style.display='';view.style.display='none';$('#foot').style.display='none';$('#docback').onclick=closeDocs;scrollTo(0,0)}
+</div></details>
+<details class="guide docs"><summary>Parent or guardian consent form, for callers aged 16 or 17 (draft)</summary><div class="gb">
+<p class="mute">Draft for review. <button class="link" id="conprint">Print this form</button></p>
+`+CONSENT+`</div></details>`;
+function showDocs(){const d=$('#docv');d.innerHTML=DOCS;d.style.display='';view.style.display='none';$('#foot').style.display='none';$('#docback').onclick=closeDocs;$('#conprint').onclick=printConsent;scrollTo(0,0)}
 function closeDocs(){const d=$('#docv');if(d.style.display==='none')return;d.style.display='none';d.innerHTML='';view.style.display='';$('#foot').style.display='';scrollTo(0,0)}
 $('#docs').onclick=showDocs; $('#nav').addEventListener('click',closeDocs); $('#vas').addEventListener('change',closeDocs);
 
@@ -434,15 +459,31 @@ function showNewPassword(){
   $('#f').onsubmit=async e=>{e.preventDefault();const {error}=await sb.auth.updateUser({password:$('#pw').value});
     if(error)return say($('#msg'),error.message,'bad'); recovering=false; route()};
 }
+/* The three application answers, shown under an applicant's note. Empty for people who applied before they were asked. */
+const appInfo=c=>(c.age&&+c.age<18?'<div class="reg" style="color:var(--warm);font-weight:600">Under 18: get the signed parent consent form before you accept</div>':'')+[c.age?'Age '+(+c.age):'',c.sales_experience?'Sales: '+c.sales_experience:'',c.availability?'Available: '+c.availability:''].filter(Boolean).map(t=>`<div class="reg">${esc(t)}</div>`).join('');
 async function showApply(){
   let team=null; if(teamCode){const r=await sb.rpc('team_name',{p_code:teamCode}); team=r.error?null:r.data}
   view.innerHTML=`<div class="card"><h2>Apply as a cold caller</h2><p class="mute small">${team?`You are applying to join <b>${esc(team)}</b>'s team. They review your application.`:'An admin reviews every application.'} Once accepted, the leads assigned to you appear here.</p>
   <form id="f"><label for="nm">Full name</label><input id="nm" autocomplete="name" required minlength="2" maxlength="120">
+  <label for="ag">Age</label><input id="ag" type="number" inputmode="numeric" required min="16" max="100" step="1">
+  <div id="minor" hidden style="margin-top:10px"><p class="note" style="color:var(--warm);background:var(--warmbg)">Because you are under 18, a parent or guardian has to sign a consent form. You cannot be accepted until you have handed it in.</p>
+  <div class="row"><button type="button" id="conopen">Open the consent form to print</button></div>
+  <label style="margin-top:10px;font-weight:400;color:var(--ink)"><input type="checkbox" id="conok"> I will get the form signed by a parent or guardian and hand it in</label></div>
   <label for="ph">Phone (optional)</label><input id="ph" type="tel" autocomplete="tel" maxlength="40">
+  <label for="sx">Sales experience</label><select id="sx" required><option value="">Choose one</option><option>No sales experience</option><option>Under 1 year</option><option>1 to 3 years</option><option>More than 3 years</option></select>
+  <label for="sd">What have you sold, and how? (optional)</label><textarea id="sd" maxlength="500" placeholder="Cold calling, door to door, retail, online…"></textarea>
+  <label for="hr">Availability: hours a week</label><select id="hr" required><option value="">Choose one</option><option>Under 10 hours a week</option><option>10 to 20 hours a week</option><option>20 to 30 hours a week</option><option>More than 30 hours a week</option></select>
+  <fieldset id="wn" style="border:0;padding:0;margin:14px 0 0"><legend style="font-size:13px;font-weight:500;color:var(--mute);padding:0;margin-bottom:6px">When can you call? Pick all that fit</legend><div class="row">${['Weekday mornings','Weekday afternoons','Weekday evenings','Weekends'].map(w=>`<label style="margin:0;font-weight:400;color:var(--ink)"><input type="checkbox" value="${w}"> ${w}</label>`).join('')}</div></fieldset>
   <label for="nt">Anything the admin should know (optional)</label><textarea id="nt" maxlength="1000"></textarea>
   <div class="row top"><button class="pri">Send application</button></div><p id="msg"></p></form></div>`;
+  const minor=()=>{const a=parseInt($('#ag').value,10);return a>=16&&a<18};
+  $('#ag').oninput=()=>{$('#minor').hidden=!minor();$('#conok').required=minor()}; $('#conopen').onclick=printConsent;
   $('#f').onsubmit=async e=>{e.preventDefault();
-    const {error}=await sb.rpc('apply_as_caller2',{p_name:$('#nm').value,p_phone:$('#ph').value,p_note:$('#nt').value,p_code:team?teamCode:null});
+    if(!(parseInt($('#ag').value,10)>=16))return say($('#msg'),'You must be at least 16 to apply.','bad');
+    const whenOk=[...document.querySelectorAll('#wn input:checked')].map(x=>x.value), sd=$('#sd').value.trim();
+    if(!whenOk.length)return say($('#msg'),'Pick at least one time you can call.','bad');
+    const {error}=await sb.rpc('apply_as_caller3',{p_name:$('#nm').value,p_phone:$('#ph').value,p_note:$('#nt').value,p_code:team?teamCode:null,
+      p_experience:$('#sx').value+(sd?': '+sd:''),p_availability:$('#hr').value+'; '+whenOk.join(', ').toLowerCase(),p_age:parseInt($('#ag').value,10)});
     if(error)return say($('#msg'),error.message,'bad'); try{localStorage.removeItem('teamCode')}catch(e){} route()};
 }
 
@@ -586,7 +627,7 @@ async function mTeam(){
   <section class="sec"><div class="pagehead"><h2>Your invite link</h2></div><p class="mute small">Send this to people you want on your team. Anyone who applies through it is attached to you, and you accept them below.</p>
   <div class="bar"><input id="ilink" readonly value="${esc(link)}" aria-label="Your invite link" style="flex:1;min-width:220px;max-width:520px"><button class="pri" id="icopy">Copy link</button></div></section>
   <section class="sec"><div class="pagehead"><h2>Applications to your team</h2><span class="stat">${ap.data.length} waiting</span></div>`+
-  (ap.data.length?`<div class="wrap attn"><table class="stack"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Note</th><th>Applied</th><th></th></tr></thead><tbody>${ap.data.map(c=>`<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td><td class="act end"><button class="pri" data-dec="1" data-id="${esc(c.id)}">Accept</button> <button data-dec="0" data-id="${esc(c.id)}">Reject</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="mute">No one is waiting. New applicants from your link appear here.</p>')+`</section>
+  (ap.data.length?`<div class="wrap attn"><table class="stack"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Note</th><th>Applied</th><th></th></tr></thead><tbody>${ap.data.map(c=>`<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}${appInfo(c)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td><td class="act end"><button class="pri" data-dec="1" data-id="${esc(c.id)}">Accept</button> <button data-dec="0" data-id="${esc(c.id)}">Reject</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="mute">No one is waiting. New applicants from your link appear here.</p>')+`</section>
   <section class="sec"><div class="pagehead"><h2>My team</h2><span class="stat">${data.length} caller${data.length===1?'':'s'} · last 30 days</span></div><p class="mute small">Everyone accepted onto your team. You see how they are doing; Joel assigns leads and closes sales.</p>`+
   (data.length?tbl(['Caller','Rank','#Leads held','#Calls','#Booked with Joel','#Sales closed','#Customer paid'],data.map(c=>`<tr><td class="nm">${esc(c.full_name)}</td><td>${esc(c.rank_name)} · ${+c.rate}%</td><td class="num">${c.held}</td><td class="num">${c.calls}</td><td class="num">${c.meets}</td><td class="num">${c.sold}</td><td class="num held">${c.paid}</td></tr>`))
    :emptyBox('No callers on your team yet. Share your invite link, or Joel can add callers to your team.'))+'</section>';
@@ -792,7 +833,7 @@ function drawAdmin(){
       <p class="mute small">They skip the application and get this role the first time they sign in with that email. No email is sent, so tell them to create an account with that address.</p>`+
       (A.invites.length?tbl(['Waiting to sign in','Role',''],A.invites.map(i=>`<tr><td>${esc(i.email)}</td><td>${i.role==='manager'?'Manager':'Cold caller'}</td><td class="act end"><button data-uninvite="${esc(i.email)}">Remove</button></td></tr>`)):'')+'</section>';
     h+=`<section class="sec"><div class="pagehead"><h2>Applications</h2></div>`+(pending.length?`<div class="wrap attn"><table class="stack"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Note</th><th>Applied</th><th></th></tr></thead><tbody>${pending.map(c=>
-      `<tr><td><div class="nm">${esc(c.full_name)}</div>${c.manager_id?`<div class="reg">via ${esc(nameOf[c.manager_id]||'a manager')}'s link</div>`:''}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td>
+      `<tr><td><div class="nm">${esc(c.full_name)}</div>${c.manager_id?`<div class="reg">via ${esc(nameOf[c.manager_id]||'a manager')}'s link</div>`:''}</td><td>${esc(c.email)}</td><td>${esc(c.phone)}</td><td>${esc(c.note)}${appInfo(c)}</td><td>${new Date(c.applied_at).toLocaleDateString()}</td>
       <td class="act end"><button class="pri" data-status="accepted" data-id="${esc(c.id)}">Accept</button> <button data-status="rejected" data-id="${esc(c.id)}">Reject</button></td></tr>`).join('')}</tbody></table></div>`
       :'<p class="mute">No applications waiting.</p>')+'</section>';
     h+=`<section class="sec"><div class="pagehead"><h2>Callers</h2><span class="stat">${accepted.length} accepted</span></div>`+(accepted.length?`<p class="mute small">"Assign" gives that caller the next unassigned leads, best first. A lead only ever belongs to one caller.</p>
