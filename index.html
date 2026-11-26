@@ -20,6 +20,40 @@ main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}
 h2{font-size:18px;font-weight:650;letter-spacing:-.01em;margin:0}
 p{margin:0 0 12px}.mute{color:var(--mute)}.small{font-size:13px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;max-width:420px;margin:6vh auto 0}.card h2{margin-bottom:6px}
+.lvsw{display:inline-flex;gap:4px;padding:4px;background:var(--panel);border-radius:10px;margin:0 0 16px}.lvsw button{height:32px;border:0;background:none;color:var(--mute);font-size:13px;font-weight:600;padding:0 12px;border-radius:7px}.lvsw button[aria-pressed=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0/.12)}
+.dk{position:relative;max-width:560px;margin:0 auto}
+.dkc{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 24px 20px;touch-action:pan-y;user-select:none;-webkit-user-select:none;will-change:transform;--l:0;--r:0;box-shadow:0 12px 32px -18px rgb(0 0 0/.35)}
+.dkc.back{position:absolute;inset:0;transform:translateY(10px) scale(.965);opacity:.55;box-shadow:none}.dkc.shake{animation:dkshake .42s cubic-bezier(.36,.07,.19,.97)}
+@keyframes dkshake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
+.dkc header{display:flex;align-items:center;gap:10px;margin-bottom:14px}.dkc header .stat{margin-left:auto}
+.dkph{display:block;font-family:var(--mono);font-size:clamp(28px,7.4vw,40px);font-weight:600;letter-spacing:-.02em;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums;user-select:text;-webkit-user-select:text}.dkph:hover{text-decoration:none;color:var(--accent)}
+.dkc h3{font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin:10px 0 0;overflow-wrap:anywhere}
+.dkf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0 0}.dkf div{background:var(--panel);border-radius:10px;padding:10px 12px;min-width:0}.dkf dt{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)}.dkf dd{margin:3px 0 0;font-size:16px;font-weight:600;overflow-wrap:anywhere}.dkf dd small{display:block;font-size:12px;font-weight:400;color:var(--mute)}
+.dkd{font-size:16px;line-height:1.5;margin:16px 0 0;max-width:52ch}.dkb{margin:8px 0 0}.dkb a{text-decoration:underline;text-underline-offset:3px}.dkc .ni:not(:empty){margin-top:8px}
+.dko{border:0;padding:0;margin:20px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.dko legend{font-size:13px;font-weight:600;color:var(--mute);padding:0;margin-bottom:8px}
+.dko label{margin:0;position:relative;cursor:pointer}.dko input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}.dko span{display:grid;place-items:center;text-align:center;min-height:56px;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--panel);font-size:14px;font-weight:600;color:var(--ink);transition:background .15s,border-color .15s,color .15s}
+.dko input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.dko input:focus-visible+span{outline:2px solid var(--ring);outline-offset:2px}
+.dkc .bkf{display:grid;gap:8px;margin-top:12px}.dkc .bkf input,.dkc .bkf textarea{width:100%;user-select:text;-webkit-user-select:text}.dkc #dkmsg{margin:12px 0 0}
+.dkc footer{display:flex;align-items:center;gap:10px;margin-top:18px}.dkc footer button:not(.link){height:48px;flex:1;border-radius:12px;font-size:15px}.dkc footer .link{padding:0 6px}
+.dkt{position:absolute;top:18px;font-family:var(--mono);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:5px 10px;border-radius:8px;pointer-events:none;z-index:1}.dkt.later{right:18px;opacity:var(--l);background:var(--warmbg);color:var(--warm)}.dkt.done{left:18px;opacity:var(--r);background:var(--okbg);color:var(--ok)}
+.dkhint{text-align:center;margin:14px 0 0}
+@media (max-width:480px){.dkc{padding:18px 16px 16px;border-radius:18px}.dko span{min-height:52px;font-size:13px}.dkf div{padding:8px 10px}.dkf dd{font-size:15px}}
+@media (prefers-reduced-motion:reduce){.dkc.shake{animation:none}}
+.hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px 36px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px 28px;margin:0 0 16px}
+.hnum{display:grid;justify-items:start;min-width:132px}.hnum b{font-size:clamp(48px,7vw,72px);line-height:1;font-weight:750;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.hnum span{font-size:13px;color:var(--mute);margin-top:6px}
+.hinfo p{margin:0}.hinfo .eyebrow{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--mute)}
+.hname{font-size:clamp(22px,3.4vw,30px);font-weight:700;letter-spacing:-.025em;line-height:1.15;margin:6px 0 0!important;overflow-wrap:anywhere}.hsub{font-size:15px;color:var(--mute);margin-top:8px!important;max-width:60ch}.hsub b{color:var(--ink)}
+.tbar{display:flex;gap:3px;height:10px;margin-top:16px;max-width:420px}.tbar i{border-radius:3px;min-width:10px}.tbar .hot,.tleg i.hot{background:var(--hot)}.tbar .warm,.tleg i.warm{background:var(--warm)}.tbar .cold,.tleg i.cold{background:var(--cold)}
+.tleg{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px!important;font-size:14px;color:var(--mute)}.tleg span{display:inline-flex;align-items:center;gap:6px}.tleg i{width:8px;height:8px;border-radius:2px}.tleg b{color:var(--ink);font-variant-numeric:tabular-nums}.tleg .due{color:var(--warm);background:var(--warmbg);padding:1px 8px;border-radius:6px}.tleg .due b{color:inherit}
+.listbar{align-items:center}.listbar .stat{margin-left:auto}
+.path{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;counter-reset:p}
+.path li{counter-increment:p;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:4px;align-content:start}.path li::before{content:counter(p);font-family:var(--mono);font-size:12px;color:var(--mute)}
+.path li b{font-size:15px}.path li small{font-size:13px;color:var(--mute);line-height:1.4}.path li.end{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.path li.end::before,.path li.end small{color:inherit;opacity:.8}
+.guide{border-radius:16px}.guide summary{padding:16px 20px;display:flex;align-items:center;gap:10px;list-style:none}.guide summary::-webkit-details-marker{display:none}.guide summary::after{content:"Open";margin-left:auto;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mute);font-weight:500}.guide[open] summary::after{content:"Close"}.guide .gb{padding:0 20px 20px}
+#navfoot{margin-top:auto;padding:10px 6px 2px;font-size:13px}#navfoot button{color:var(--mute);font-size:13px;font-weight:500;text-align:left;white-space:normal;line-height:1.3;min-height:0!important;padding:0!important;border:0!important;background:none!important;width:auto!important;display:inline!important}#navfoot button:hover{color:var(--ink)}
+@media (min-width:761px){#shell:not(.nonav) #nav{display:flex;flex-direction:column;min-height:calc(100vh - 124px)}#shell:not(.nonav) #foot{display:none}}
+@media (max-width:760px){.hero{grid-template-columns:auto minmax(0,1fr);gap:16px;padding:16px;align-items:start}.hnum{min-width:0}.hnum b{font-size:44px}.hname{font-size:20px}.tbar{margin-top:10px}.path{grid-template-columns:1fr 1fr}}
+@media (min-width:761px) and (max-width:1199px){#navfoot{text-align:center;padding:8px 2px 2px}#navfoot button{font-size:11px;text-align:center}}
 .ob{max-width:540px;margin:7vh auto 0}.ob-top{display:flex;align-items:center;gap:12px;margin-bottom:40px}
 .ob-back{width:32px;height:32px;padding:0;display:grid;place-content:center;border-radius:8px;flex:none}
 .ob-prog{flex:1;height:4px;border-radius:2px;background:var(--panel);overflow:hidden}.ob-prog i{display:block;height:100%;width:0;background:var(--accent);border-radius:2px;transition:width .5s cubic-bezier(.16,1,.3,1)}
@@ -116,7 +150,7 @@ h2{font-size:19px;letter-spacing:-.02em}
 #nav button{font-size:14px}#nav button[aria-current]{box-shadow:inset 0 -2px 0 var(--ring)}
 .badge,.stat,.sum dd,td.ph,td.num,td.held,#who,input[type=number]{font-family:var(--mono);letter-spacing:0}
 .badge{border-radius:5px;font-size:11px;padding:2px 6px}.badge.new{background:var(--hl);color:var(--hl-ink)}
-input,select,textarea,button{border-radius:7px}.card,.wrap,.sum{border-radius:10px}.bar.sel{border-radius:9px}
+input,select,textarea,button{border-radius:7px}.card{border-radius:10px}.wrap,.sum{border-radius:16px}.bar.sel{border-radius:9px}
 th,.sum dt{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.07em}
 th{background:none;border-bottom-color:var(--line)}
 .sum dd{font-size:26px;font-weight:600;letter-spacing:-.03em;margin-top:4px}.sum div{padding:14px 16px}
@@ -257,6 +291,14 @@ const stage=l=>l.outcome!=='booked'?'No booking':!l.meet?'Meet booked':l.meet===
 const chip=l=>{const t=stage(l);return `<span class="tier plain ${t==='Customer paid'?'ok':t==='Meet booked'?'warm':t==='Sold, awaiting payment'?'cold':'no'}">${t}</span>`};
 const tbl=(h,rows,cls='')=>`<div class="wrap"><table class="${cls}"><thead><tr>${h.map(x=>`<th${x[0]==='#'?' class="num"':''}>${x.replace(/^#/,'')}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
 const emptyBox=t=>`<div class="wrap"><div class="empty">${t}</div></div>`;
+/* The page-top panel every section opens with, in the Rank page's shape: one headline figure, then what it means. */
+const hero=(num,unit,eyebrow,title,body,opts={})=>`<div class="hero"><div class="hnum"><b ${opts.money?'data-money ':''}data-count="${+num||0}">${opts.money?'$0':'0'}</b><span>${unit}</span></div><div class="hinfo"><p class="eyebrow">${eyebrow}</p><p class="hname">${title}</p>${body||''}</div></div>`;
+/* Counts every [data-count] figure up from zero once, as the Rank page does. Still when motion is turned down. */
+function countUp(root=view){const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  root.querySelectorAll('[data-count]').forEach(el=>{const to=+el.dataset.count,fmt=v=>('money' in el.dataset?'$':'')+Math.round(v).toLocaleString();if(calm||!to){el.textContent=fmt(to);return}
+    const t0=performance.now(),dur=700+Math.min(600,to*20);const tick=t=>{const p=Math.min(1,(t-t0)/dur);el.textContent=fmt(to*(1-Math.pow(1-p,3)));if(p<1&&el.isConnected)requestAnimationFrame(tick)};requestAnimationFrame(tick)})}
+/* How a booking turns into pay, shown where a caller has nothing to list yet. The rate is their own. */
+const payPath=rate=>`<ol class="path"><li><b>You book a Meet</b><small>A 15-minute Google Meet with the manager.</small></li><li><b>The manager runs it</b><small>They show the website and close the sale.</small></li><li><b>The customer pays</b><small>The sale counts once the money is in.</small></li><li class="end"><b>You earn ${rate!=null?+rate+'%':'your commission'}</b><small>Of that sale, at the rank you hold then.</small></li></ol>`;
 const fail=e=>{view.innerHTML=`<p class="note bad">${esc(e.message)}</p>`};
 const bar=(label,have,need)=>`<div class="pb"><div class="l"><span>${label}</span><span>${have} of ${need} · ${have>=need?'done':(need-have)+' to go'}</span></div><div class="track"><i style="width:${Math.min(100,Math.round(have/Math.max(need,1)*100))}%"></i></div></div>`;
 function funnel(calls,meets,sold,paid,comm,commLabel){const rows=[['Cold calls made','Cold callers',calls,calls],['Demo Meets booked with Joel','Cold callers',meets,calls],['Sales closed','Joel',sold,meets],['Payments received','Joel',paid,sold]],mx=Math.max(calls,1);
@@ -389,7 +431,7 @@ const DOCS=`<div class="pagehead"><h2>Legal and tax documents</h2><button id="do
 `+CONSENT+`</div></details>`;
 function showDocs(){const d=$('#docv');d.innerHTML=DOCS;d.style.display='';view.style.display='none';$('#foot').style.display='none';$('#docback').onclick=closeDocs;$('#conprint').onclick=printConsent;scrollTo(0,0)}
 function closeDocs(){const d=$('#docv');if(d.style.display==='none')return;d.style.display='none';d.innerHTML='';view.style.display='';$('#foot').style.display='';scrollTo(0,0)}
-$('#docs').onclick=showDocs; $('#nav').addEventListener('click',closeDocs); $('#vas').addEventListener('change',closeDocs);
+$('#docs').onclick=showDocs; $('#nav').addEventListener('click',e=>{if(e.target.closest('[data-docs]'))setTimeout(showDocs,0)}); $('#nav').addEventListener('click',closeDocs); $('#vas').addEventListener('change',closeDocs);
 
 /* The sections are drawn into #nav by each screen. This mirrors them into the phone tbar and its More sheet, and adds the icons,
    so every role (admin, manager, cold caller, or both) gets the same layout without its own code. */
@@ -416,6 +458,7 @@ function syncNav(){
     (rest.length?`<button data-more aria-expanded="${sheet.hidden?'false':'true'}"${rest.some(cur)?' data-on':''}>${icon('more')}<span>More</span>${rest.some(b=>num(b)!=null)?'<b></b>':''}</button>`:'');
   $('#sheetl').innerHTML=rest.map(b=>{const x=b.querySelector('.badge');return `<button data-go="${esc(b.dataset.tab)}"${cur(b)?' aria-current="page"':''}>${icon(b.dataset.tab)}<span>${esc(lab(b))}</span>${x?`<span class="${x.className}">${esc(x.textContent)}</span>`:'<span></span>'}</button>`}).join('');
   if(!rest.length)sheetOpen(false);
+  if(!navEl.querySelector('#navfoot'))navEl.insertAdjacentHTML('beforeend','<div id="navfoot"><button class="link" data-docs>Legal and tax documents</button></div>');
   navObs.takeRecords();
 }
 const navObs=new MutationObserver(syncNav);navObs.observe(navEl,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-current'],characterData:true});
@@ -640,7 +683,7 @@ const GUIDE=`<details class="guide" id="guide"><summary>Your job and the call sc
 <p><b>"Not interested."</b> Thank them, then press Check off and "No booking". Never push past a clear no, and if they ask not to be called again, do not call again.</p>
 <p><b>Nobody picked up:</b> press Check off, then "No answer". It stays on your list to try again.</p>
 <p class="warn">Keep it true. Do not say a website has already been made for them unless the manager has confirmed one exists for that business. Do not make up search results, numbers or reasons to rush. Do not promise they will make more money.</p></div></details>`;
-function wireGuide(){const g=document.getElementById('guide');if(!g)return;let shut=false;try{shut=localStorage.getItem('guideShut')==='1'}catch(e){}g.open=!shut;g.ontoggle=()=>{try{localStorage.setItem('guideShut',g.open?'0':'1')}catch(e){}}}
+function wireGuide(){const g=document.getElementById('guide');if(!g)return;let open=false;try{open=localStorage.getItem('guideOpen')==='1'}catch(e){}g.open=open;g.ontoggle=()=>{try{localStorage.setItem('guideOpen',g.open?'1':'0')}catch(e){}}}
 let C={tab:'leads'};
 /* A manager who is also a cold caller gets both sets of sections in one bar. D is the section showing; the caller and
    manager screens keep their own tab state, and the set that is not showing is blanked so a slow answer cannot draw over it. */
@@ -662,9 +705,13 @@ function callerTab(){
 }
 async function showBookings(){
   view.innerHTML=LOADING; const {data,error}=await api('my_bookings'); if(C.tab!=='book')return; if(error)return fail(error);
-  view.innerHTML=`<div class="pagehead"><h2>My bookings</h2><span class="stat">${data.length} booked</span></div><p class="mute small">Every Meet you booked stays yours. If Joel closes it and the customer pays, the commission is yours.</p>`+
-  (data.length?tbl(['Business','Booked','Meet','Where it stands','#Your commission'],data.map(l=>`<tr><td><div class="nm">${esc(l.business_name)}</div><div class="reg">${esc(l.city)}, ${esc(l.region)}</div></td><td>${when(l.completed_at)}</td><td>${when(l.bk_when)||'–'}</td><td>${chip({...l,outcome:'booked'})}</td><td class="num">${l.meet==='sale'?money(l.comm_amount)+(l.customer_paid_at?(l.comm_paid_at?' · paid':' · owed'):' · pending'):'–'}</td></tr>`))
-   :emptyBox('No bookings yet. When you book a Meet it shows here with where it stands.'));
+  const st=data.map(l=>stage({...l,outcome:'booked'})), n=k=>st.filter(x=>x===k).length, rate=ME&&ME.rank?ME.rank.rate:null;
+  view.innerHTML=hero(data.length,data.length===1?'Meet booked':'Meets booked','My bookings',data.length?'Every one stays yours':'None yet',
+    `<p class="hsub">${data.length?'If the manager closes it and the customer pays, the commission is yours, whoever holds the lead later.':'When you book a Meet it shows here, with where it stands.'}</p>`)+
+  (data.length?`<dl class="sum s3"><div><dt>Waiting for the Meet</dt><dd data-count="${n('Meet booked')}">0</dd></div><div><dt>Sold, awaiting payment</dt><dd data-count="${n('Sold, awaiting payment')}">0</dd></div><div><dt>Customer paid</dt><dd data-count="${n('Customer paid')}">0</dd></div></dl>`+
+    tbl(['Business','Booked','Meet','Where it stands','#Your commission'],data.map(l=>`<tr><td><div class="nm">${esc(l.business_name)}</div><div class="reg">${esc(l.city)}, ${esc(l.region)}</div></td><td>${when(l.completed_at)}</td><td>${when(l.bk_when)||'–'}</td><td>${chip({...l,outcome:'booked'})}</td><td class="num">${l.meet==='sale'?money(l.comm_amount)+(l.customer_paid_at?(l.comm_paid_at?' · paid':' · owed'):' · pending'):'–'}</td></tr>`))
+   :`<div class="pagehead"><h2>How a booking pays</h2></div>`+payPath(rate));
+  countUp();
 }
 async function showRank(){
   view.innerHTML=LOADING; const [s,r,m]=await Promise.all([api('my_state2'),sb.from('ranks').select('*').order('pos'),api('my_summary')]);
@@ -692,10 +739,73 @@ async function showRank(){
 }
 async function showEarnings(){
   view.innerHTML=LOADING; const [m,b]=await Promise.all([api('my_summary'),api('my_bookings')]); if(C.tab!=='earn')return; const e=m.error||b.error; if(e)return fail(e);
-  const x=m.data, L=b.data.filter(l=>l.meet==='sale'&&l.customer_paid_at);
-  view.innerHTML=`<div class="pagehead"><h2>Earnings</h2></div><dl class="sum s3"><div><dt>Sales paid, last 30 days</dt><dd>${x.sales30}</dd></div><div><dt>Commission earned</dt><dd>${money(x.earned)}</dd></div><div><dt>Still owed to you</dt><dd>${money(x.owed)}</dd></div></dl>`+
-  (L.length?tbl(['Business','Customer paid','#Sale','#Your rate','#Commission','Status'],L.map(l=>`<tr><td class="nm">${esc(l.business_name)}</td><td>${when(l.customer_paid_at)}</td><td class="num">${money(l.sale_amount)}</td><td class="num">${+l.comm_rate}%</td><td class="num">${money(l.comm_amount)}</td><td><span class="tier plain ${l.comm_paid_at?'ok':'no'}">${l.comm_paid_at?'Paid':'Owed'}</span></td></tr>`))
-   :emptyBox('No commission yet. It appears here when Joel closes one of your bookings and the customer pays.'));
+  const x=m.data, L=b.data.filter(l=>l.meet==='sale'&&l.customer_paid_at), rk=ME&&ME.rank, earned=+x.earned||0, owed=+x.owed||0;
+  view.innerHTML=hero(earned,'commission earned','Earnings',owed?`${money(owed)} still owed to you`:earned?'All paid out':'Nothing earned yet',
+    `<p class="hsub">${rk?`You are a <b>${esc(rk.name)}</b>: <b>${+rk.rate}%</b> of every sale from your bookings.`:'Commission is earned when a customer you booked has paid.'}</p>`,{money:true})+
+  `<dl class="sum s3"><div><dt>Sales paid, last 30 days</dt><dd data-count="${+x.sales30||0}">0</dd></div><div><dt>Paid out to you</dt><dd data-money data-count="${Math.max(0,earned-owed)}">$0</dd></div><div><dt>Still owed to you</dt><dd data-money data-count="${owed}">$0</dd></div></dl>`+
+  (L.length?`<div class="pagehead"><h2>Sale by sale</h2><span class="stat">${L.length} paid</span></div>`+tbl(['Business','Customer paid','#Sale','#Your rate','#Commission','Status'],L.map(l=>`<tr><td class="nm">${esc(l.business_name)}</td><td>${when(l.customer_paid_at)}</td><td class="num">${money(l.sale_amount)}</td><td class="num">${+l.comm_rate}%</td><td class="num">${money(l.comm_amount)}</td><td><span class="tier plain ${l.comm_paid_at?'ok':'no'}">${l.comm_paid_at?'Paid':'Owed'}</span></td></tr>`))
+   :`<div class="pagehead"><h2>How you get paid</h2></div>`+payPath(rk?rk.rate:null));
+  countUp();
+}
+/*
+ * Leads one at a time, as a stack of cards. Swipe left (or press Do later) to put a lead at the back of the stack;
+ * swipe right (or press Finished) to record what happened, which needs one of the three boxes ticked first.
+ * It records through the same backend calls as the full list. The short description is put together from what
+ * the lead already holds (type, town, Google rating), so it costs nothing and invents nothing.
+ */
+function leadDeck(rows,x){
+  const deck=[...rows], host=$('#deck'), tries=Object.fromEntries(rows.map(l=>[l.id,l.tries||0])), calm=matchMedia('(prefers-reduced-motion: reduce)').matches; let pick=null, busy=false;
+  const desc=l=>{const where=[l.city,l.region].filter(Boolean).join(', '),r=parseFloat(l.google_rating)||0,n=+l.google_reviews||0;
+    return `${esc(l.category||'Local business')}${where?' in '+esc(where):''}.`+(r?` Rated ${r.toFixed(1)} on Google${n?` from ${n.toLocaleString()} review${n===1?'':'s'}`:''}.`:'')+' Listed with no website: check before you call.'};
+  const count=()=>{const b=view.querySelector('.hnum b'),u=view.querySelector('.hnum span');if(b){b.textContent=deck.length;u.textContent=deck.length===1?'lead to call':'leads to call'}};
+  function draw(){
+    if(!deck.length)return showMyLeads();
+    const l=deck[0], r=parseFloat(l.google_rating)||0, tel=String(l.phone||'').replace(/[^\d+]/g,''); pick=null;
+    host.innerHTML=`<div class="dk">${deck.length>1?'<div class="dkc back" aria-hidden="true"></div>':''}<article class="dkc" id="dkc" aria-label="${esc(l.business_name)}">
+      <span class="dkt later" aria-hidden="true">Do later</span><span class="dkt done" aria-hidden="true">Finished</span>
+      <header><span class="tier ${esc(l.tier)}">${esc(l.tier)}</span>${tries[l.id]?`<span class="reg">tried ${tries[l.id]}×</span>`:''}<span class="stat">${deck.length} left</span></header>
+      <a class="dkph" href="tel:${esc(tel)}">${esc(l.phone)}</a><h3>${esc(l.business_name)}</h3>
+      <dl class="dkf"><div><dt>Town</dt><dd>${esc(l.city||'–')}</dd></div><div><dt>Type</dt><dd>${esc(l.category||'–')}</dd></div><div><dt>Rating</dt><dd>${r?r.toFixed(1):'–'}${l.google_reviews?` <small>${(+l.google_reviews).toLocaleString()} reviews</small>`:''}</dd></div></dl>
+      <p class="dkd">${desc(l)}</p>${l.best_time_to_call?`<p class="reg dkb">Best time to call: ${esc(l.best_time_to_call)}${l.local_time_zone?' · '+esc(l.local_time_zone):''}</p>`:''}
+      <div class="ni" id="dkni">${x.ni(l.id)}</div>${/^https:\/\//.test(l.source_link||'')?`<p class="dkb"><a href="${esc(l.source_link)}" target="_blank" rel="noopener">Open the Google listing</a></p>`:''}
+      <fieldset class="dko"><legend>What happened on the call?</legend>${[['booked','Booked a call'],['no_answer','No answer'],['not_booked','No booking']].map(([v,t])=>`<label><input type="radio" name="dko" value="${v}"><span>${t}</span></label>`).join('')}</fieldset>
+      <div class="bkf" id="dkbook" hidden>${x.cal?`<a class="calbtn" href="${esc(x.cal)}" target="_blank" rel="noopener">1. Pick a time on Joel's calendar</a><span class="reg">Book it there with the owner's name and email, so Google sends them the Meet invite. Then fill in the same details here.</span>`:''}<input class="bn" maxlength="120" placeholder="Owner's name" aria-label="Owner's name"><input class="be" type="email" maxlength="200" placeholder="Their email, for the Meet invite" aria-label="Their email"><input class="bw" type="datetime-local" aria-label="Meet day and time"></div>
+      <div class="bkf" id="dknote" hidden><textarea class="nb" rows="2" maxlength="2000" placeholder="Note: what they said, what to do next" aria-label="Note"></textarea><span class="reg">Call back on (optional)</span><input class="nf" type="datetime-local" value="${x.fuOf[l.id]?x.local(x.fuOf[l.id]):''}" aria-label="Follow-up day and time"><div class="row"><button type="button" class="pri" id="dknsave">Save note</button><button type="button" class="link" id="dkncancel">Cancel</button></div></div>
+      <p id="dkmsg" role="alert"></p>
+      <footer><button type="button" id="dklater">Do later</button><button type="button" class="link" id="dknoteb">Note</button><button type="button" class="pri" id="dkdone">Finished</button></footer></article></div>
+     <p class="mute small dkhint">Swipe left to do it later, right when you are finished. The buttons do the same.</p>`;
+    const c=$('#dkc'), err=t=>{say($('#dkmsg'),t,'bad');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake')};
+    const fly=(dir,then)=>{if(calm)return then();c.style.transition='transform .28s cubic-bezier(.4,0,.8,.4),opacity .28s';c.style.transform=`translateX(${dir*130}%) rotate(${dir*14}deg)`;c.style.opacity='0';setTimeout(then,260)};
+    const back=()=>{c.style.transition='transform .3s cubic-bezier(.16,1,.3,1)';c.style.transform='';c.style.setProperty('--l',0);c.style.setProperty('--r',0)};
+    const later=()=>{if(busy)return;say($('#msg'),'');fly(-1,()=>{deck.push(deck.shift());draw()})};
+    const done=async()=>{
+      if(busy)return; if(!pick){back();return err('Tick a box first: Booked a call, No answer or No booking.')}
+      const args={p_lead:l.id,p_outcome:pick};
+      if(pick==='booked'){const n=c.querySelector('.bn').value.trim(),w=c.querySelector('.bw').value;if(!n||!w){back();return err("Add the owner's name and the Meet day and time first.")}
+        Object.assign(args,{p_name:n,p_email:c.querySelector('.be').value.trim(),p_when:new Date(w).toISOString()})}
+      busy=true; c.querySelectorAll('button').forEach(b=>b.disabled=true);
+      const {error}=await sb.rpc('complete_lead2',args); busy=false;
+      if(error){c.querySelectorAll('button').forEach(b=>b.disabled=false);back();return err(error.message)}
+      const biz=l.business_name, res=pick;
+      fly(1,()=>{if(res==='no_answer'){tries[l.id]++;deck.push(deck.shift())}else deck.shift(); count(); draw();
+        say($('#msg'),res==='no_answer'?'No answer at '+biz+'. It stays in your stack to try again.':res==='booked'?'Booked: '+biz+'. It is yours: if Joel closes it and the customer pays, the commission is yours.':'Checked off: '+biz+' (no booking).','ok')});
+    };
+    c.querySelectorAll('[name=dko]').forEach(i=>i.onchange=()=>{pick=i.value;$('#dkbook').hidden=pick!=='booked';say($('#dkmsg'),'');if(pick==='booked')c.querySelector('.bn').focus()});
+    $('#dklater').onclick=later; $('#dkdone').onclick=done;
+    $('#dknoteb').onclick=()=>{$('#dknote').hidden=!$('#dknote').hidden;if(!$('#dknote').hidden)c.querySelector('.nb').focus()}; $('#dkncancel').onclick=()=>{$('#dknote').hidden=true};
+    $('#dknsave').onclick=async()=>{const t=c.querySelector('.nb').value.trim(),f=c.querySelector('.nf').value,fw=f?new Date(f).toISOString():null,fch=(fw||'')!==(x.fuOf[l.id]?new Date(x.fuOf[l.id]).toISOString():'');
+      if(!t&&!fch)return err('Write a note or pick a call-back time first.');
+      const r1=t?await sb.rpc('add_lead_note',{p_lead:l.id,p_body:t}):{}, r2=fch?await sb.rpc('set_lead_followup',{p_lead:l.id,p_when:fw}):{}, er=r1.error||r2.error; if(er)return err(er.message);
+      if(t)(x.notes[l.id]=x.notes[l.id]||[]).unshift({body:t}); if(fch)x.fuOf[l.id]=fw; $('#dkni').innerHTML=x.ni(l.id); c.querySelector('.nb').value=''; $('#dknote').hidden=true; say($('#dkmsg'),'Saved.','ok')};
+    /* Dragging the card. It only starts on the card itself, never on a button, box or field, and never on an up-and-down scroll. */
+    let sx=0,sy=0,dx=0,drag=false,id=null;
+    c.onpointerdown=e=>{if(busy||e.button>0||e.target.closest('button,a,input,textarea,label,select'))return;sx=e.clientX;sy=e.clientY;dx=0;drag=false;id=e.pointerId};
+    c.onpointermove=e=>{if(id!==e.pointerId)return;dx=e.clientX-sx;const dy=e.clientY-sy;if(!drag){if(Math.abs(dx)<10||Math.abs(dx)<Math.abs(dy)*1.2)return;drag=true;try{c.setPointerCapture(id)}catch(z){}c.style.transition='none'}
+      c.style.transform=`translateX(${dx}px) rotate(${dx/22}deg)`;c.style.setProperty('--l',Math.min(1,Math.max(0,-dx/110)));c.style.setProperty('--r',Math.min(1,Math.max(0,dx/110)))};
+    c.onpointerup=c.onpointercancel=e=>{if(id!==e.pointerId)return;id=null;if(!drag)return;drag=false;if(dx<-110)later();else if(dx>110)done();else back()};
+    c.onkeydown=e=>{if(e.target.closest('input,textarea,select'))return;if(e.key==='ArrowLeft'){e.preventDefault();later()}else if(e.key==='ArrowRight'){e.preventDefault();done()}};
+  }
+  draw();
 }
 async function showMyLeads(){
   const [{data,error},bl,nt]=await Promise.all([api('my_leads'),sb.rpc('booking_link'),api('my_notes')]); if(C.tab!=='leads')return;
@@ -705,13 +815,19 @@ async function showMyLeads(){
   const cal=!bl.error&&/^https:\/\/(calendar\.app\.google|calendar\.google\.com)\//.test(bl.data||'')?bl.data:'';
   if(error){view.innerHTML=`<p class="note bad">${esc(error.message)}</p>`;return}
   const rows=(data||[]).sort(byRank);
-  if(!rows.length){view.innerHTML=GUIDE+'<div class="pagehead"><h2>Your leads</h2></div><div class="wrap"><div class="empty">You have no leads to call right now. New ones appear here when the admin assigns them.</div></div><div class="row top"><button id="again">Check again</button></div>';$('#again').onclick=showMyLeads;wireGuide();return}
-  view.innerHTML=GUIDE+`<div class="pagehead"><h2>Your leads</h2><span class="stat" id="cnt"></span></div>
-  <div class="bar"><input id="q" type="search" placeholder="Search name, town, type" aria-label="Search your leads"></div><p id="msg" role="status"></p>
+  if(!rows.length){view.innerHTML=hero(0,'leads to call','Your leads','Nothing to call right now','<p class="hsub">New leads appear here when the admin assigns them.</p><div class="row" style="margin-top:14px"><button id="again">Check again</button></div>')+GUIDE;$('#again').onclick=showMyLeads;wireGuide();return}
+  const tn=k=>rows.filter(l=>l.tier===k).length, due=rows.filter(l=>l.follow_up_at&&new Date(l.follow_up_at)<=new Date()).length, T3=[['hot','Hot'],['warm','Warm'],['cold','Cold']].filter(([k])=>tn(k));
+  const LV=(()=>{try{return localStorage.getItem('leadView')==='list'?'list':'cards'}catch(e){return 'cards'}})();
+  const head=hero(rows.length,rows.length===1?'lead to call':'leads to call','Your leads','Hottest first',
+    `<div class="tbar" role="img" aria-label="${T3.map(([k,t])=>tn(k)+' '+t.toLowerCase()).join(', ')}">${T3.map(([k])=>`<i class="${k}" style="flex:${tn(k)}"></i>`).join('')}</div>
+     <p class="tleg">${T3.map(([k,t])=>`<span><i class="${k}"></i><b>${tn(k)}</b> ${t.toLowerCase()}</span>`).join('')}${due?`<span class="due"><b>${due}</b> follow-up${due>1?'s':''} due</span>`:''}</p>`)+GUIDE+`<div class="lvsw" role="group" aria-label="How to show your leads"><button data-lv="cards" aria-pressed="${LV==='cards'}">One at a time</button><button data-lv="list" aria-pressed="${LV==='list'}">Full list</button></div><p id="msg" role="status"></p>`;
+  const wireSw=()=>view.querySelectorAll('[data-lv]').forEach(b=>b.onclick=()=>{try{localStorage.setItem('leadView',b.dataset.lv)}catch(e){} showMyLeads()});
+  if(LV==='cards'){view.innerHTML=head+'<div id="deck"></div>';wireSw();wireGuide();countUp();return leadDeck(rows,{cal,notes,fuOf,ni,local})}
+  view.innerHTML=head+`<div class="bar listbar"><input id="q" type="search" placeholder="Search name, town, type" aria-label="Search your leads"><span class="stat" id="cnt"></span></div>
   <div class="wrap"><table class="mine"><thead><tr><th>Phone</th><th>Business</th><th>Town</th><th>Type</th><th class="num">Rating</th><th class="num">Reviews</th><th>Tier</th><th>Best time to call</th><th>After the call</th></tr></thead>
   <tbody>${rows.map(l=>`<tr data-id="${l.id}">${leadCells(l)}<td class="c-time">${esc(l.best_time_to_call)}<div class="reg">${esc(l.local_time_zone)}</div><div class="ni">${ni(l.id)}</div></td><td class="act">${offBtn(l.tries)}</td></tr>`).join('')}</tbody></table></div>`;
   let trs=[...view.querySelectorAll('tbody tr')]; const go=()=>{const s=$('#q').value.toLowerCase();let k=0;trs.forEach(r=>{const ok=r.textContent.toLowerCase().includes(s);r.hidden=!ok;if(ok)k++});$('#cnt').textContent=k+' of '+trs.length+' leads'};
-  $('#q').oninput=go;go();wireGuide();
+  $('#q').oninput=go;go();wireGuide();countUp();wireSw();
   const tries=Object.fromEntries(rows.map(l=>[l.id,l.tries||0]));
   view.querySelector('tbody').onclick=async e=>{
     const b=e.target.closest('button'); if(!b)return; const tr=b.closest('tr'), cell=b.closest('td'), id=+tr.dataset.id, biz=tr.children[1].textContent.trim();
@@ -1050,4 +1166,4 @@ function drawAdmin(){
     go();
   }
 }
-</script><script src="discord.js?v=3"></script></body></html>
+</script><script src="discord.js?v=4"></script></body></html>

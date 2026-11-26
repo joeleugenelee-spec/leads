@@ -12,7 +12,7 @@
   const SERVER = 'https://discord.com/channels/1575314833522434128';
   const slot = document.createElement('div');
   slot.id = 'dsc';
-  document.getElementById('ann').after(slot);
+  document.getElementById('foot').before(slot);   // at the foot of the page, out of the way of the work
   let shownFor = null, busy = false, carry = '';
 
   const fn = async (body) => {
@@ -52,8 +52,7 @@
   function draw(name, note) {
     const said = note ? `<p class="mute small" role="status" style="margin:8px 0 0">${esc(note)}</p>` : '';
     slot.innerHTML = name
-      ? `<div class="annc"><h3><span>Discord</span><span>Connected</span></h3><p>Connected as <b>${esc(name)}</b>. Your rank role in the Moonshot Sites Callers server updates by itself when your rank changes.</p>
-         <div class="row top" style="margin-top:10px"><a href="${SERVER}" target="_blank" rel="noopener noreferrer">Open the Discord</a> <button class="link" id="dsc-off">Disconnect</button></div>${said}</div>`
+      ? `<p class="mute small" style="margin:24px 0 0">Discord: connected as <b>${esc(name)}</b> · <a href="${SERVER}" target="_blank" rel="noopener noreferrer">Open the server</a> · <button class="link" id="dsc-off">Disconnect</button></p>${said}`
       : `<div class="annc"><h3><span>Discord</span><span>Not connected</span></h3><p>Join the Moonshot Sites Callers Discord in one tap. You get your rank role straight away, and it updates by itself as you rank up.</p>
          <div class="row top" style="margin-top:10px"><button class="pri" id="dsc-on">Connect Discord</button></div>${said}</div>`;
     const on = document.getElementById('dsc-on'), off = document.getElementById('dsc-off');
